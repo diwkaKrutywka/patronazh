@@ -20,6 +20,7 @@
           <!-- Группа кнопок действий -->
           <div class="buttons-group">
             <a-button @click="downloadTemplate" class="action-btn">📄 {{ $t('l_Download_template') }}</a-button>
+            <a-button @click="downloadExcel" class="action-btn">📄 {{ $t('l_Download_excel') }}</a-button>
             <a-button type="primary" @click="fileInput?.click()" class="action-btn">{{ $t('l_Upload_file') }}</a-button>
             <input
               type="file"
@@ -96,7 +97,7 @@
           <template v-else-if="column.key === 'Action'">
             <a-space>
               <img
-                class="w-[15px]"
+                class="w-[25px] mr-4"
                 src="../../assets/edit.png"
                 @click.stop="onEdit(record)"
               />
@@ -107,13 +108,13 @@
                 :cancel-text="$t('l_No')"
                 @confirm="onDelete(record.id)"
               >
-                <img class="w-[15px]" src="../../assets/delete.png" @click.stop />
+                <img class="w-[25px]" src="../../assets/delete.png" @click.stop />
               </a-popconfirm>
-              <img
+              <!-- <img
                 class="w-[15px]"
                 src="../../assets/essay.png"
                 @click.stop="toDetail(record.id)"
-              />
+              /> -->
             </a-space>
           </template>
         </template>
@@ -216,7 +217,7 @@ const onDelete = async (id: string) => {
 
 const downloadTemplate = async () => {
   try {
-    const response = await PregnantApi("template", {}, "GET", { fileDownload: true });
+    const response = await PregnantApi("template/", {}, "GET", { fileDownload: true });
     const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -230,7 +231,22 @@ const downloadTemplate = async () => {
     message.error($t("l_File_download_failed"));
   }
 };
-
+const downloadExcel = async () => {
+  try {
+    const response = await PregnantApi("download/", {}, "GET", { fileDownload: true });
+    const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "pregnant_list.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch {
+    message.error($t("l_File_download_failed"));
+  }
+};
 const handleFileUpload = async (e: Event) => {
   const target = e.target as HTMLInputElement;
   if (!target.files?.length) return;
