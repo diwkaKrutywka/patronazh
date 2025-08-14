@@ -52,18 +52,19 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'Action'">
           <a-space>
-            <span
-              class="icon material-symbols-outlined cursor-pointer text-lg text-black"
-              @click="onEdit(record)"
+            <img class="w-[15px]" src="../../assets/edit.png"></img>
+       
+            <a-popconfirm
+   
+              placement="leftBottom"
+              title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+              :ok-text="$t('l_Yes')"
+              :cancel-text="$t('l_No')"
+              @confirm="onDelete(record.id)"
             >
-              edit
-            </span>
-            <span
-              class="icon material-symbols-outlined cursor-pointer text-lg text-black"
-              @click="onDelete(record.id)"
-            >
-              delete
-            </span>
+           <img class="w-[15px]" src="../../assets/delete.png"></img>
+            </a-popconfirm>
+            <img class="w-[15px]" src="../../assets/essay.png"></img>
           </a-space>
         </template>
       </template>

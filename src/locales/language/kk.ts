@@ -44,4 +44,13 @@ export default {
   l_Search_placeholder: "Іздеу",
   l_Upload_file: "Файлды жүктеу",
   l_Download_template: "Үлгіні жүктеп алу",
+  l_Pregnant_women: "Жүкті әйелдер",
+  l_Trimester: "Триместр",
+  l_Monitoring_week: "Бақылау аптасы",
+  l_Risk_status: "Қауіп деңгейі",
+  l_Total_records: "Жалпы жазбалар",
+  l_Visit_date: "Келу күні",
+  l_Due_date_12_weeks: "Болжамды босану күні (12 апта)",
+  l_Pregnancy_weeks: "Жүктілік аптасы",
+  l_Monitoring_category: "Бақылау санаты",
 };

@@ -36,4 +36,13 @@ export default {
   l_Search_placeholder: "Поиск",
   l_Upload_file: "Загрузить файл",
   l_Download_template: "Скачать шаблон",
+  l_Pregnant_women: "Беременные женщины",
+  l_Trimester: "Триместр",
+  l_Monitoring_week: "Неделя мониторинга",
+  l_Risk_status: "Статус риска",
+  l_Total_records: "Всего записей",
+  l_Visit_date: "Дата визита",
+  l_Due_date_12_weeks: "Предполагаемая дата родов (12 недель)",
+  l_Pregnancy_weeks: "Недели беременности",
+  l_Monitoring_category: "Категория мониторинга",
 };
