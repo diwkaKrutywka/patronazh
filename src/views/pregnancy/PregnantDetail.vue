@@ -59,7 +59,8 @@
       <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
         <h3>{{ $t("l_Surveys") }}</h3>
         <a-button type="primary" @click="onAddSurvey">
-          ➕ {{ $t("l_Add_survey") }}
+          <span class="material-symbols-outlined"> add 
+       <span class="ml-2"> {{ $t("l_Add_survey") }}</span> </span>
         </a-button>
       </div>
       <div class="table-wrapper">
@@ -70,7 +71,37 @@
           size="small"
           :loading="loadingSurveys"
           bordered
-        />
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'Action'">
+              <a-space>
+                <img
+                  class="w-[25px] mr-4"
+                  src="../../assets/edit.png"
+                  @click.stop="onEdit(record)"
+                />
+                <a-popconfirm
+                  placement="leftBottom"
+                  title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+                  :ok-text="$t('l_Yes')"
+                  :cancel-text="$t('l_No')"
+                  @confirm="onDelete(record.id)"
+                >
+                  <img
+                    class="w-[25px]"
+                    src="../../assets/delete.png"
+                    @click.stop
+                  />
+                </a-popconfirm>
+                <!-- <img
+                class="w-[15px]"
+                src="../../assets/essay.png"
+                @click.stop="toDetail(record.id)"
+              /> -->
+              </a-space>
+            </template>
+          </template>
+        </a-table>
       </div>
     </template>
 
@@ -78,6 +109,7 @@
     <AddEditSurvey
       v-model:open="surveyModalVisible"
       :pregnantWomanId="props.id"
+      :surveyId="editingSurveyId"
       @success="fetchSurveys"
     />
   </a-drawer>
@@ -87,8 +119,10 @@
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
-import { message } from "ant-design-vue";
+import { SurveysApi } from "../../api/survey";
 
+import { message } from "ant-design-vue";
+import { h } from "vue";
 import AddEditSurvey from "./AddEditSurvey.vue";
 const { t: $t } = useI18n();
 
@@ -100,28 +134,72 @@ const props = defineProps<{
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
+  const pagination = ref({
+  current: 1,
+  pageSize: 10,
+  total: 0,
+  showSizeChanger: true,
+  pageSizeOptions: ["10", "20", "50"],
+  showQuickJumper: true,
+  showTotal: (total: number) => $t("l_Total_records", { total }),
+});
 
 // ======== Список анкет ========
 const surveys = ref([]);
 const loadingSurveys = ref(false);
 const surveyModalVisible = ref(false);
-
+const onDelete = async (id: string) => {
+  try {
+    await SurveysApi(`pregnant-women/${id}/`, {}, "DELETE");
+    message.success($t("l_Delete_success"));
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Delete_failed"));
+  }
+};
 const surveyColumns = [
+{
+    title: "#",
+    key: "index",
+    width: 50,
+    customRender: ({ index }: { index: number }) =>
+      (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
+  },
   { title: $t("l_Fill_date"), dataIndex: "fill_date" },
-  { title: $t("l_Risk_identified_date"), dataIndex: "risk_identified_date" },
-  { title: $t("l_Nutrition"), dataIndex: "nutrition" },
-  { title: $t("l_Depression"), dataIndex: "depression" },
-  { title: $t("l_Medical_risks"), dataIndex: "medical_risks" },
-  { title: $t("l_Bad_habits"), dataIndex: "bad_habits" },
-  { title: $t("l_Social_risks"), dataIndex: "social_risks" },
+  { title: $t("l_IIN"), dataIndex: "woman_iin" },
+  { title: $t("l_Name"), dataIndex: "woman_name" },
+  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks" },
+  { title: $t("l_Organization"), dataIndex: "organization_name" },
+  { title: $t("l_Total_score"), dataIndex: "total_score" },
+  { title: $t("l_Max_score"), dataIndex: "max_score" },
+  {
+    title: $t("l_Risk_level"),
+    dataIndex: "risk_level",
+    customRender: ({ record }: { record: any }) => {
+      return h(
+        "span",
+        { style: { color: record.risk_color } },
+        record.risk_level
+      );
+    },
+  },
+
+  { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
+const editingSurveyId = ref<string | null>(null);
+
+const onEdit = (record: any) => {
+  editingSurveyId.value = record.id;
+  surveyModalVisible.value = true;
+};
 
 const fetchSurveys = async () => {
   if (!props.id) return;
   loadingSurveys.value = true;
   try {
-    const { data } = await PregnantApi(`${props.id}/surveys/`, {}, "GET");
-    surveys.value = data;
+    const { data } = await SurveysApi(`pregnant-women/`, {  page: pagination.value.current,
+      page_size: pagination.value.pageSize, pregnant_woman: `${props.id}`}, "GET");
+    surveys.value = data.items;
   } finally {
     loadingSurveys.value = false;
   }

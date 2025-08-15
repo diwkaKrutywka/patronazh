@@ -73,4 +73,6 @@ export default {
   l_Medical_risks: "Медициналық қауіптер",
   l_Bad_habits: "Зиянды әдеттер",
   l_Social_risks: "Әлеуметтік қауіптер",
+  l_Download_excel: "Excel жүктеу",
+  l_Filter: "Сүзгі",
 };

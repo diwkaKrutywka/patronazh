@@ -77,4 +77,6 @@ export default {
   l_Medical_risks: "Medical risks",
   l_Bad_habits: "Bad habits",
   l_Social_risks: "Social risks",
+  l_Download_excel:"Download Excel",
+  l_Filter:"Filter"
 };

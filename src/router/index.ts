@@ -20,6 +20,11 @@ const routes: RouteRecordRaw[] = [
         name: "PregnancyList",
         component: () => import("../views/pregnancy/PregnancyList.vue"),
       },
+      {
+        path: "reports",
+        name: "ReportList",
+        component: () => import("../views/reports/ReportsList.vue"),
+      },
     ],
   },
   {

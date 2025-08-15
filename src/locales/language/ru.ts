@@ -65,7 +65,9 @@ export default {
   l_Medical_risks: "Медицинские риски",
   l_Bad_habits: "Вредные привычки",
   l_Social_risks: "Социальные риски",
-  l_Surveys:"Анкеты",
-  l_Add_survey:"Создать анкету",
-  l_Due_date:"Планируемый день рожание"
+  l_Surveys: "Анкеты",
+  l_Add_survey: "Создать анкету",
+  l_Due_date: "Планируемый день рожание",
+  l_Download_excel: "Скачать Excel",
+  l_Filter: "Фильтр",
 };
