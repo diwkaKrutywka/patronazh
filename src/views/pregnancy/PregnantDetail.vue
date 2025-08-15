@@ -59,8 +59,9 @@
       <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
         <h3>{{ $t("l_Surveys") }}</h3>
         <a-button type="primary" @click="onAddSurvey">
-          <span class="material-symbols-outlined"> add 
-       <span class="ml-2"> {{ $t("l_Add_survey") }}</span> </span>
+          <span class="material-symbols-outlined">
+            add <span class="ml-2"> {{ $t("l_Add_survey") }}</span>
+          </span>
         </a-button>
       </div>
       <div class="table-wrapper">
@@ -70,6 +71,8 @@
           rowKey="id"
           size="small"
           :loading="loadingSurveys"
+          :pagination="pagination"
+          @change="handleTableChange"
           bordered
         >
           <template #bodyCell="{ column, record }">
@@ -134,7 +137,7 @@ const props = defineProps<{
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
-  const pagination = ref({
+const pagination = ref({
   current: 1,
   pageSize: 10,
   total: 0,
@@ -158,7 +161,7 @@ const onDelete = async (id: string) => {
   }
 };
 const surveyColumns = [
-{
+  {
     title: "#",
     key: "index",
     width: 50,
@@ -197,9 +200,17 @@ const fetchSurveys = async () => {
   if (!props.id) return;
   loadingSurveys.value = true;
   try {
-    const { data } = await SurveysApi(`pregnant-women/`, {  page: pagination.value.current,
-      page_size: pagination.value.pageSize, pregnant_woman: `${props.id}`}, "GET");
+    const { data } = await SurveysApi(
+      `pregnant-women/`,
+      {
+        page: pagination.value.current,
+        page_size: pagination.value.pageSize,
+        pregnant_woman: `${props.id}`,
+      },
+      "GET"
+    );
     surveys.value = data.items;
+    pagination.value.total = data.total;
   } finally {
     loadingSurveys.value = false;
   }
@@ -207,6 +218,12 @@ const fetchSurveys = async () => {
 
 const onAddSurvey = () => {
   surveyModalVisible.value = true;
+};
+
+const handleTableChange = (pag: any) => {
+  pagination.value.current = pag.current;
+  pagination.value.pageSize = pag.pageSize;
+  fetchSurveys();
 };
 
 // ======== Загрузка данных беременной ========

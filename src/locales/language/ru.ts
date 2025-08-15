@@ -70,4 +70,11 @@ export default {
   l_Due_date: "Планируемый день рожание",
   l_Download_excel: "Скачать Excel",
   l_Filter: "Фильтр",
+  l_Name: "Имя",
+  l_Weeks_of_pregnancy: "Недели беременности",
+  l_Total_score: "Общий балл",
+  l_Max_score: "Максимальный балл",
+  l_Risk_level: "Уровень риска",
+  l_Due_date_32_weeks: "Срок до 32 недель",
+  l_Reports:"Отчетность"
 };

@@ -75,4 +75,10 @@ export default {
   l_Social_risks: "Әлеуметтік қауіптер",
   l_Download_excel: "Excel жүктеу",
   l_Filter: "Сүзгі",
+  l_Name: "Аты",
+  l_Weeks_of_pregnancy: "Жүктіліктің аптасы",
+  l_Total_score: "Жалпы балл",
+  l_Max_score: "Ең жоғары балл",
+  l_Risk_level: "Қауіп деңгейі",
+  l_Due_date_32_weeks: "32 аптаға дейінгі мерзім",
 };

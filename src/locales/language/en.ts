@@ -77,6 +77,12 @@ export default {
   l_Medical_risks: "Medical risks",
   l_Bad_habits: "Bad habits",
   l_Social_risks: "Social risks",
-  l_Download_excel:"Download Excel",
-  l_Filter:"Filter"
+  l_Download_excel: "Download Excel",
+  l_Filter: "Filter",
+  l_Name: "Name",
+  l_Weeks_of_pregnancy: "Weeks of pregnancy",
+  l_Total_score: "Total score",
+  l_Max_score: "Max score",
+  l_Risk_level: "Risk level",
+  l_Due_date_32_weeks: "Due date (32 weeks)",
 };
