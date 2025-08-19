@@ -43,7 +43,7 @@ export default {
   l_Total_records: "Всего записей",
   l_Visit_date: "Дата визита",
   l_Due_date_12_weeks: "Предполагаемая дата родов (12 недель)",
-  l_Pregnancy_weeks: "Недели беременности",
+  l_Pregnancy_weeks: "Текущая недели беременности",
   l_Monitoring_category: "Категория мониторинга",
   survey_info_intro:
     "Создание нового мониторингового опроса для конкретной беременной женщины.",
@@ -76,5 +76,21 @@ export default {
   l_Max_score: "Максимальный балл",
   l_Risk_level: "Уровень риска",
   l_Due_date_32_weeks: "Срок до 32 недель",
-  l_Reports:"Отчетность"
+  l_Reports: "Отчетность",
+  l_Create_child_survey: "Создать новое обследование здоровья для ребёнка",
+
+  l_Breastfeeding: "Грудное вскармливание (0-6 мес)",
+  l_Complementary_feeding: "Дополнительное питание (6 мес-3 года)",
+  l_Attachment: "Привязанность ребёнка/родителя",
+  l_Father_involvement: "Участие отца",
+  l_Stimulating_environment: "Стимулирующая среда",
+  l_Parental_depression: "Депрессия у родителей",
+  l_Safe_environment: "Безопасная среда",
+  l_Neglect_abuse: "Пренебрежение / Насилие",
+  l_Speech_development: "Развитие речи",
+  l_Motor_development: "Моторное развитие",
+  l_Socio_emotional_development: "Социально-эмоциональное развитие",
+  l_Low_weight: "Недостаточный вес",
+  l_Low_height: "Низкий рост",
+  l_Overweight: "Избыточный вес",
 };

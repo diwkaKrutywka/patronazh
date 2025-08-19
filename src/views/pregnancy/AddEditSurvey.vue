@@ -2,9 +2,9 @@
   <a-modal
     v-model:open="modalVisible"
     :title="$t('l_Create_survey')"
-    @ok="handleSubmit"
+      @cancel="closeModal"
     :confirm-loading="loading"
-    @cancel="handleCancel"
+    :footer="null"
     destroyOnClose
   >
     <!-- Информационный блок -->
@@ -64,6 +64,12 @@
       <a-form-item :label="$t('l_Social_risks')">
         <a-input-number v-model:value="form.social_risks" :min="0" :max="2" style="width: 100%" />
       </a-form-item>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <a-button type="primary" @click="handleSubmit">{{
+          $t("l_Create")
+        }}</a-button>
+      </div>
     </a-form>
   </a-modal>
 </template>

@@ -52,19 +52,24 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'Action'">
           <a-space>
-            <img class="w-[15px]" src="../../assets/edit.png"></img>
-       
+            <img
+              class="w-[25px] mr-4 cursor-pointer hover:opacity-70"
+              src="../../assets/edit.png"
+              @click="onEdit(record)"
+            />
+
             <a-popconfirm
-   
               placement="leftBottom"
               title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
               :ok-text="$t('l_Yes')"
               :cancel-text="$t('l_No')"
               @confirm="onDelete(record.id)"
             >
-           <img class="w-[15px]" src="../../assets/delete.png"></img>
+              <img
+                class="w-[25px] cursor-pointer hover:opacity-70"
+                src="../../assets/delete.png"
+              />
             </a-popconfirm>
-            <img class="w-[15px]" src="../../assets/essay.png"></img>
           </a-space>
         </template>
       </template>
@@ -76,17 +81,25 @@
       :id="editingKid?.id"
       @submit="fetchKids"
     />
+
+    <!-- Модалка деталей -->
+    <kid-details
+      :visible="detailsVisible"
+      :id="selectedKid"
+      @close="detailsVisible = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, h, onMounted, watch } from "vue";
-import { Avatar, message, Tag, Modal } from "ant-design-vue";
+import { Avatar, message, Tag } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { useGlobal } from "../../composables/useGlobal";
 import { KidsApi } from "../../api/kids";
 import type { TableRenderProps } from "../../types/table";
 import AddEditKid from "./AddEditKid.vue";
+import KidDetails from "./KidDetails.vue"; // 👈 новый компонент
 
 const { t: $t } = useI18n();
 
@@ -107,8 +120,13 @@ const search = ref("");
 const currentFilters = ref<Record<string, any>>({});
 const tableData = ref<Kid[]>([]);
 const loading = ref(false);
+
 const modalVisible = ref(false);
 const editingKid = ref<Kid | null>(null);
+
+const detailsVisible = ref(false);
+const selectedKid = ref<string | null>(null);
+
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const pagination = ref({
@@ -121,6 +139,12 @@ const pagination = ref({
   showTotal: (total: number) => $t("l_Total_records", { total }),
 });
 
+const onOpenDetails = (id: string) => {
+  selectedKid.value = id;
+  detailsVisible.value = true;
+  console.log(selectedKid)
+};
+
 const columns = [
   {
     title: "#",
@@ -132,7 +156,7 @@ const columns = [
   {
     title: $t("l_Full_name"),
     dataIndex: "full_name",
-    customRender: ({ text }: TableRenderProps<Kid>) => {
+    customRender: ({ text, record }: TableRenderProps<Kid>) => {
       const initials = (text as string)
         .split(" ")
         .map((w) => w[0])
@@ -151,7 +175,14 @@ const columns = [
           },
           () => initials
         ),
-        h("span", text),
+        h(
+          "span",
+          {
+            class: "cursor-pointer hover:text-blue-600 transition",
+            onClick: () => onOpenDetails(record.id),
+          },
+          text
+        ),
       ]);
     },
   },
@@ -204,23 +235,16 @@ const onAddKid = () => {
   modalVisible.value = true;
 };
 
-const onDelete = (id: string) => {
-  Modal.confirm({
-    title: $t("l_Confirm_delete_title"),
-    content: $t("l_Confirm_delete"),
-    okText: $t("l_Yes"),
-    cancelText: $t("l_No"),
-    async onOk() {
-      try {
-        await KidsApi(`${id}/`, {}, "DELETE");
-        message.success($t("l_Delete_success"));
-        fetchKids();
-      } catch {
-        message.error($t("l_Delete_failed"));
-      }
-    },
-  });
+const onDelete = async (id: string) => {
+  try {
+    await KidsApi(`${id}/`, {}, "DELETE");
+    message.success($t("l_Delete_success"));
+    fetchKids();
+  } catch {
+    message.error($t("l_Delete_failed"));
+  }
 };
+
 const downloadTemplate = async () => {
   try {
     const response = await KidsApi("template", {}, "GET", {

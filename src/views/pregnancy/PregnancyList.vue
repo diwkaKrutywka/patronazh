@@ -14,14 +14,23 @@
 
           <!-- Кнопка для показа фильтров -->
           <a-button @click="showFilters = !showFilters">
-            🔍 {{ $t('l_Filter') }}
+            🔍 {{ $t("l_Filter") }}
           </a-button>
 
           <!-- Группа кнопок действий -->
           <div class="buttons-group">
-            <a-button @click="downloadTemplate" class="action-btn">📄 {{ $t('l_Download_template') }}</a-button>
-            <a-button @click="downloadExcel" class="action-btn">📄 {{ $t('l_Download_excel') }}</a-button>
-            <a-button type="primary" @click="fileInput?.click()" class="action-btn">{{ $t('l_Upload_file') }}</a-button>
+            <a-button @click="downloadTemplate" class="action-btn"
+              >📄 {{ $t("l_Download_template") }}</a-button
+            >
+            <a-button @click="downloadExcel" class="action-btn"
+              >📄 {{ $t("l_Download_excel") }}</a-button
+            >
+            <a-button
+              type="primary"
+              @click="fileInput?.click()"
+              class="action-btn"
+              >{{ $t("l_Upload_file") }}</a-button
+            >
             <input
               type="file"
               ref="fileInput"
@@ -29,7 +38,9 @@
               style="display: none"
               @change="handleFileUpload"
             />
-            <a-button type="primary" @click="onAdd" class="action-btn">➕ {{ $t('l_Add_pregnant') }}</a-button>
+            <a-button type="primary" @click="onAdd" class="action-btn"
+              >➕ {{ $t("l_Add_pregnant") }}</a-button
+            >
           </div>
         </div>
 
@@ -66,8 +77,8 @@
               allowClear
               @change="fetchPregnantWomen"
             >
-              <a-select-option value="true">{{ $t('l_Yes') }}</a-select-option>
-              <a-select-option value="false">{{ $t('l_No') }}</a-select-option>
+              <a-select-option value="true">{{ $t("l_Yes") }}</a-select-option>
+              <a-select-option value="false">{{ $t("l_No") }}</a-select-option>
             </a-select>
           </div>
         </transition>
@@ -108,7 +119,11 @@
                 :cancel-text="$t('l_No')"
                 @confirm="onDelete(record.id)"
               >
-                <img class="w-[25px]" src="../../assets/delete.png" @click.stop />
+                <img
+                  class="w-[25px]"
+                  src="../../assets/delete.png"
+                  @click.stop
+                />
               </a-popconfirm>
               <!-- <img
                 class="w-[15px]"
@@ -142,7 +157,7 @@ import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import AddEditPregnant from "./AddEditPregnant.vue";
 import PregnantDetail from "./PregnantDetail.vue";
-
+import dayjs from "dayjs"; // добавляем для форматирования дат
 const { t: $t } = useI18n();
 
 const showFilters = ref(false);
@@ -158,10 +173,19 @@ type Pregnant = {
   iin: string;
   full_name: string;
   birth_date: string;
+  visit_date: string;
   pregnancy_weeks: number;
+  due_date_12_weeks: string;
+  due_date_32_weeks: string;
   address: string;
+  organization_id: string;
   organization_name: string;
   monitoring_category: string;
+  surveys_count: number;
+  last_survey_date: string;
+  current_risk_level: string;
+  created_at: string;
+  updated_at: string;
 };
 
 const search = ref("");
@@ -194,9 +218,16 @@ const columns = [
   { title: $t("l_IIN"), dataIndex: "iin" },
   { title: $t("l_Birth_date"), dataIndex: "birth_date" },
   { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks" },
+
   { title: $t("l_Address"), dataIndex: "address" },
   { title: $t("l_Organization"), dataIndex: "organization_name" },
-  { title: $t("l_Monitoring_category"), dataIndex: "monitoring_category" },
+  {
+    title: $t("l_Visit_date"),
+    dataIndex: "visit_date",
+    customRender: ({ text }: { text: string }) =>
+      text ? dayjs(text).format("DD.MM.YYYY") : "",
+  },
+  // { title: $t("l_Monitoring_category"), dataIndex: "monitoring_category" },
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
 
@@ -217,7 +248,9 @@ const onDelete = async (id: string) => {
 
 const downloadTemplate = async () => {
   try {
-    const response = await PregnantApi("template/", {}, "GET", { fileDownload: true });
+    const response = await PregnantApi("template/", {}, "GET", {
+      fileDownload: true,
+    });
     const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -233,7 +266,9 @@ const downloadTemplate = async () => {
 };
 const downloadExcel = async () => {
   try {
-    const response = await PregnantApi("download/", {}, "GET", { fileDownload: true });
+    const response = await PregnantApi("download/", {}, "GET", {
+      fileDownload: true,
+    });
     const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -392,5 +427,15 @@ watch(search, (val) => {
   .action-btn {
     width: 100%;
   }
+}
+.search-input :deep(.ant-input-search-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-input :deep(.ant-input-search-button .anticon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

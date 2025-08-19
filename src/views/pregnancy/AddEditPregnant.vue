@@ -2,7 +2,7 @@
     <a-modal
       :title="id ? $t('l_Edit_pregnant') : $t('l_Add_pregnant')"
       :visible="open"
-      @ok="handleSubmit"
+    
       @cancel="closeModal"
       :confirmLoading="loading"
       destroyOnClose
@@ -36,6 +36,11 @@
         <a-form-item :label="$t('l_Address')" name="address">
           <a-input v-model:value="form.address" />
         </a-form-item>
+        <div class="flex justify-end gap-2 mt-4">
+        <a-button type="primary" @click="handleSubmit">{{
+          $t("l_Create")
+        }}</a-button>
+      </div>
       </a-form>
     </a-modal>
   </template>

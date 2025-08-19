@@ -1,58 +1,62 @@
 <template>
   <a-drawer
     :visible="visible"
-    :title="$t('l_Pregnant_women')"
+    :title="$t('l_Kids')"
     placement="right"
     width="800"
     @close="$emit('close')"
   >
-    <!-- Основная информация -->
+    <!-- Основная информация о ребёнке -->
     <a-descriptions
       bordered
       column="3"
       size="small"
-      v-if="data"
+     v-if="data"
       layout="vertical"
     >
-      <a-descriptions-item :label="$t('l_Full_name')"><a-tag color="green">{{
-        data.full_name
-      }}</a-tag></a-descriptions-item>
-      <a-descriptions-item :label="$t('l_IIN')">{{
-        data.iin
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Birth_date')">{{
-        data.birth_date
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Visit_date')">{{
-        data.visit_date
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Pregnancy_weeks')"><a-tag color="blue">{{
-        data.pregnancy_weeks
-      }}</a-tag></a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Due_date_12_weeks')">{{
-        data.due_date_12_weeks
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Due_date_32_weeks')">{{
-        data.due_date_32_weeks
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Address')">{{
-        data.address
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Organization')">{{
-        data.organization_name
-      }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Monitoring_category')">{{
-        data.monitoring_category
-      }}</a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Full_name')">
+       <a-tag color="green">{{ data.full_name }}</a-tag> 
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_IIN')">
+        {{ data.iin }}
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Birth_date')">
+        {{ data.birth_date }}
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Gender')">
+        {{ data.gender }}
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Age_months')">
+        {{ data.age_months }}
+      </a-descriptions-item>
+      <!-- <a-descriptions-item :label="$t('l_Age_category')">
+        {{ data.age_category }}
+      </a-descriptions-item> -->
+      <a-descriptions-item :label="$t('l_Address')">
+        {{ data.address }}
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Organization')">
+        {{ data.organization_name }}
+      </a-descriptions-item>
+      <!-- <a-descriptions-item :label="$t('l_Surveys_count')">
+        {{ data.surveys_count }}
+      </a-descriptions-item> -->
+      <!-- <a-descriptions-item :label="$t('l_Visit_date')">
+        {{ data.last_survey_date }}
+      </a-descriptions-item> -->
+      <a-descriptions-item :label="$t('l_Risk_level')">
+       <a-tag color="blue">{{ data.current_risk_level }}</a-tag> 
+      </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Created_at')">
-        {{ $formatIsoDate(data.created_at) }}
-      </a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Updated_at')">
-        {{ $formatIsoDate(data.updated_at) }}
-      </a-descriptions-item>
+  {{ $formatIsoDate(data.created_at) }}
+</a-descriptions-item>
+<a-descriptions-item :label="$t('l_Updated_at')">
+  {{ $formatIsoDate(data.updated_at) }}
+</a-descriptions-item>
+
     </a-descriptions>
 
-    <div v-else class="text-center py-5"><a-spin /> {{ $t("l_Loading") }}</div>
+   
 
     <!-- Список анкет -->
     <template v-if="data">
@@ -60,10 +64,11 @@
         <h3>{{ $t("l_Surveys") }}</h3>
         <a-button type="primary" @click="onAddSurvey">
           <span class="material-symbols-outlined">
-            add <span class="ml-2"> {{ $t("l_Add_survey") }}</span>
+            add <span class="ml-2">{{ $t("l_Add_survey") }}</span>
           </span>
         </a-button>
       </div>
+
       <div class="table-wrapper">
         <a-table
           :dataSource="surveys"
@@ -85,7 +90,7 @@
                 />
                 <a-popconfirm
                   placement="leftBottom"
-                  title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+                  title="Сіз расымен анкетаны өшіргіңіз келеді ме?"
                   :ok-text="$t('l_Yes')"
                   :cancel-text="$t('l_No')"
                   @confirm="onDelete(record.id)"
@@ -96,11 +101,6 @@
                     @click.stop
                   />
                 </a-popconfirm>
-                <!-- <img
-                class="w-[15px]"
-                src="../../assets/essay.png"
-                @click.stop="toDetail(record.id)"
-              /> -->
               </a-space>
             </template>
           </template>
@@ -111,7 +111,7 @@
     <!-- Модалка добавления анкеты -->
     <AddEditSurvey
       v-model:open="surveyModalVisible"
-      :pregnantWomanId="props.id"
+      :kidId="props.id"
       :surveyId="editingSurveyId"
       @success="fetchSurveys"
     />
@@ -119,13 +119,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, h } from "vue";
 import { useI18n } from "vue-i18n";
-import { PregnantApi } from "../../api/pregnancy";
-import { SurveysApi } from "../../api/survey";
-
 import { message } from "ant-design-vue";
-import { h } from "vue";
+import { KidsApi } from "../../api/kids";
+import { SurveysApi } from "../../api/survey";
 import AddEditSurvey from "./AddEditSurvey.vue";
 import { useGlobal } from "../../composables/useGlobal"; // путь поправь
 
@@ -140,6 +138,8 @@ const props = defineProps<{
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
+
+// ======== Пагинация ========
 const pagination = ref({
   current: 1,
   pageSize: 10,
@@ -154,15 +154,8 @@ const pagination = ref({
 const surveys = ref([]);
 const loadingSurveys = ref(false);
 const surveyModalVisible = ref(false);
-const onDelete = async (id: string) => {
-  try {
-    await SurveysApi(`pregnant-women/${id}/`, {}, "DELETE");
-    message.success($t("l_Delete_success"));
-    fetchSurveys();
-  } catch {
-    message.error($t("l_Delete_failed"));
-  }
-};
+const editingSurveyId = ref<string | null>(null);
+
 const surveyColumns = [
   {
     title: "#",
@@ -172,31 +165,37 @@ const surveyColumns = [
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
   },
   { title: $t("l_Fill_date"), dataIndex: "fill_date" },
-  { title: $t("l_IIN"), dataIndex: "woman_iin" },
-  { title: $t("l_Name"), dataIndex: "woman_name" },
-  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks" },
+  { title: $t("l_IIN"), dataIndex: "child_iin" },
+  { title: $t("l_Name"), dataIndex: "child_name" },
   { title: $t("l_Organization"), dataIndex: "organization_name" },
   { title: $t("l_Total_score"), dataIndex: "total_score" },
   { title: $t("l_Max_score"), dataIndex: "max_score" },
   {
     title: $t("l_Risk_level"),
     dataIndex: "risk_level",
-    customRender: ({ record }: { record: any }) => {
-      return h(
-        "span",
-        { style: { color: record.risk_color } },
-        record.risk_level
-      );
-    },
+    customRender: ({ record }: { record: any }) =>
+      h("span", { style: { color: record.risk_color } }, record.risk_level),
   },
-
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
-const editingSurveyId = ref<string | null>(null);
+
+const onAddSurvey = () => {
+  surveyModalVisible.value = true;
+};
 
 const onEdit = (record: any) => {
   editingSurveyId.value = record.id;
   surveyModalVisible.value = true;
+};
+
+const onDelete = async (id: string) => {
+  try {
+    await SurveysApi(`children/${id}/`, {}, "DELETE");
+    message.success($t("l_Delete_success"));
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Delete_failed"));
+  }
 };
 
 const fetchSurveys = async () => {
@@ -204,11 +203,11 @@ const fetchSurveys = async () => {
   loadingSurveys.value = true;
   try {
     const { data } = await SurveysApi(
-      `pregnant-women/`,
+      `children/`,
       {
         page: pagination.value.current,
         page_size: pagination.value.pageSize,
-        pregnant_woman: `${props.id}`,
+        child: `${props.id}`,
       },
       "GET"
     );
@@ -219,28 +218,25 @@ const fetchSurveys = async () => {
   }
 };
 
-const onAddSurvey = () => {
-  surveyModalVisible.value = true;
-};
-
 const handleTableChange = (pag: any) => {
   pagination.value.current = pag.current;
   pagination.value.pageSize = pag.pageSize;
   fetchSurveys();
 };
 
-// ======== Загрузка данных беременной ========
+// ======== Загрузка данных ребёнка ========
 watch(
   () => props.id,
   async (newId) => {
     if (props.visible && newId) {
       data.value = null;
       try {
-        const { data: res } = await PregnantApi(`${newId}/`, {}, "GET");
+        const { data: res } = await KidsApi(`${newId}/`, {}, "GET");
         data.value = res;
+       
         fetchSurveys();
       } catch {
-        message.error($t("l_Failed_to_load_pregnant_details"));
+        message.error($t("l_Failed_to_load_kid_details"));
       }
     }
   },

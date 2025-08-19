@@ -3,9 +3,9 @@
     class="relative flex shadow gap-1 h-20 pr-3 pl-3 justify-between items-center"
   >
     <!-- Left section -->
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1 ">
       <div
-        class="bg-transparent flex items-center border border-blue-100 rounded-md"
+        class="bg-transparent cursor-pointer flex items-center border border-blue-100 rounded-md"
         @click="$emit('toggle-drawer')"
       >
         <span
