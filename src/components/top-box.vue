@@ -3,10 +3,11 @@
     class="relative flex shadow gap-1 h-20 pr-3 pl-3 justify-between items-center"
   >
     <!-- Left section -->
-    <div class="flex items-center gap-1 ">
+    <div class="flex items-center gap-1">
       <div
-        class="bg-transparent cursor-pointer flex items-center border border-blue-100 rounded-md"
+        class="bg-transparent flex items-center border border-blue-100 rounded-md cursor-pointer"
         @click="$emit('toggle-drawer')"
+        title="Menu"
       >
         <span
           class="text-xl material-symbols-outlined text-blue-400 bg-blue-100"
@@ -59,16 +60,9 @@
               {{ userStore.user?.email }}
             </div>
             <div class="flex flex-col gap-1 w-full">
-              <template v-for="(value, key) in userInfo.user.value" :key="key">
-                <div
-                  v-if="
-                    key !== 'username' && key !== 'email' && key !== 'avatar'
-                  "
-                >
-                  <span
-                    class="text-xs text-gray-400 uppercase tracking-wider"
-                    >{{ key }}</span
-                  >
+              <template v-for="([key, value], idx) in filteredUserEntries" :key="key + '_' + idx">
+                <div>
+                  <span class="text-xs text-gray-400 uppercase tracking-wider">{{ key }}</span>
                   <span class="text-sm text-gray-700">{{ value }}</span>
                 </div>
               </template>
@@ -92,10 +86,8 @@ import { defineEmits } from "vue";
 import ChangeLanguageBox from "./change-language-box.vue";
 import { useUserStore } from "../store/index";
 import { storeToRefs } from "pinia";
-import {  ref } from "vue";
+import {  ref, computed } from "vue";
 import { onMounted, onUnmounted } from "vue";
-import { useI18n } from "vue-i18n";
-const { t: $t } = useI18n();
 
 
 const emit = defineEmits(["toggle-drawer"]);
@@ -105,15 +97,7 @@ const isUserDropdownOpen = ref(false);
 const toggleUserDropdown = () => {
   isUserDropdownOpen.value = !isUserDropdownOpen.value;
 };
-import { useRouter } from "vue-router";
-const router = useRouter();
-const activeMessageId = ref<string | null>(null);
-
-function handleAppealClick(msg: any) {
-  activeMessageId.value = msg.data.appeal_id; // подсветим активное уведомление
-  emit("toggle-drawer"); // закроем drawer (если родитель слушает)
-  router.push({ path: "/appeals", query: { id: msg.data.appeal_id } }); // переход
-}
+// router-related code removed as unused
 
 const onSignOut = () => {
   //userStore.signOut();
@@ -125,13 +109,28 @@ const handleClickOutside = (event: MouseEvent) => {
     isUserDropdownOpen.value = false;
   }
 };
-function formatTime(timestamp: number) {
-  return new Date(timestamp).toLocaleString();
-}
+// unused formatter removed
 onMounted(() => {
   document.addEventListener("mousedown", handleClickOutside);
 });
 onUnmounted(() => {
   document.removeEventListener("mousedown", handleClickOutside);
+});
+
+// Filtered user entries for dropdown
+const filteredUserEntries = computed(() => {
+  const user = userInfo.user.value as Record<string, unknown> | null | undefined;
+  if (!user || typeof user !== 'object') return [] as Array<[string, string]>;
+  const excluded = new Set(['username', 'email', 'avatar', 'full_name']);
+  const result: Array<[string, string]> = [];
+  for (const [key, value] of Object.entries(user)) {
+    if (excluded.has(key)) continue;
+    if (value == null) continue;
+    const val = typeof value === 'string' || typeof value === 'number'
+      ? String(value)
+      : JSON.stringify(value);
+    result.push([key, val]);
+  }
+  return result;
 });
 </script>

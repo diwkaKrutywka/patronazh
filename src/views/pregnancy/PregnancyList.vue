@@ -1,87 +1,117 @@
 <template>
   <div>
+    <!-- Мобильный/планшетный заголовок -->
+    <div class="block lg:hidden px-3 ">
+      <span class="text-xl font-bold mb-2">{{ $t('l_Pregnant_women') }}</span>
+    </div>
     <a-page-header :title="$t('l_Pregnant_women')">
       <template #extra>
-        <div class="header-actions">
+        <div
+          class="flex flex-wrap gap-3 w-full flex-col sm:flex-row items-stretch sm:items-center sm:justify-end"
+        >
           <!-- Поиск -->
           <a-input-search
             v-model:value="search"
             :placeholder="$t('l_Search_placeholder')"
-            class="search-input"
+            class="search-input w-full sm:w-[400px]"
             @search="fetchPregnantWomen"
             allowClear
           />
 
-          <!-- Кнопка для показа фильтров -->
-          <a-button @click="showFilters = !showFilters">
-            🔍 {{ $t("l_Filter") }}
+          <!-- Фильтры -->
+          <a-popover
+            trigger="click"
+            v-model:open="filtersOpen"
+            placement="bottomLeft"
+          >
+            <template #content>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-[92vw] max-w-[420px]">
+                
+                <div>
+                  <a-input-number style="width: 100%;"
+                    v-model:value="currentFilters.pregnancy_weeks_min"
+                    :placeholder="$t('l_Pregnancy_weeks_min')"
+                    class="w-full"
+                    :min="0"
+                    :max="50"
+                  />
+                </div>
+                <div>
+                  <a-input-number style="width: 100%;"
+                    v-model:value="currentFilters.pregnancy_weeks_max"
+                    :placeholder="$t('l_Pregnancy_weeks_max')"
+                    class="w-full"
+                    :min="0"
+                    :max="50"
+                  />
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.trimester"
+                    :placeholder="$t('l_Trimester')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="1">1</a-select-option>
+                    <a-select-option value="2">2</a-select-option>
+                    <a-select-option value="3">3</a-select-option>
+                  </a-select>
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.monitoring_week"
+                    :placeholder="$t('l_Monitoring_week')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="12">12</a-select-option>
+                    <a-select-option value="32">32</a-select-option>
+                  </a-select>
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.has_risk"
+                    :placeholder="$t('l_Risk_status')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="true">{{ $t('l_Yes') }}</a-select-option>
+                    <a-select-option value="false">{{ $t('l_No') }}</a-select-option>
+                  </a-select>
+                </div>
+                <div class="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                  <a-button class="w-full sm:w-auto" @click="resetFilters">{{ $t('l_Reset') }}</a-button>
+                  <a-button class="w-full sm:w-auto" type="primary" @click="applyFilters">{{ $t('l_Apply_filters') }}</a-button>
+                </div>
+              </div>
+            </template>
+            <a-button class="w-full sm:w-auto min-w-[150px]" type="primary" ghost>
+              <span class="icon active material-symbols-outlined">filter_alt <span>{{ $t('l_Filter') }}</span></span>
+            </a-button>
+          </a-popover>
+
+          <!-- Действия -->
+          <a-button @click="downloadExcel" class="w-full sm:w-auto">📄 {{ $t('l_Download_excel') }}</a-button>
+          <a-button class="w-full sm:w-auto" @click="downloadTemplate">
+            <span class="ml-2">📄 {{ $t('l_Download_template') }}</span>
           </a-button>
-
-          <!-- Группа кнопок действий -->
-          <div class="buttons-group">
-            <a-button @click="downloadTemplate" class="action-btn"
-              >📄 {{ $t("l_Download_template") }}</a-button
-            >
-            <a-button @click="downloadExcel" class="action-btn"
-              >📄 {{ $t("l_Download_excel") }}</a-button
-            >
-            <a-button
-              type="primary"
-              @click="fileInput?.click()"
-              class="action-btn"
-              >{{ $t("l_Upload_file") }}</a-button
-            >
-            <input
-              type="file"
-              ref="fileInput"
-              accept=".csv, .xls, .xlsx"
-              style="display: none"
-              @change="handleFileUpload"
-            />
-            <a-button type="primary" @click="onAdd" class="action-btn"
-              >➕ {{ $t("l_Add_pregnant") }}</a-button
-            >
-          </div>
+          <a-button class="w-full sm:w-auto" @click="fileInput?.click()">
+            <span class="material-symbols-outlined">upload <span class="ml-2">{{ $t('l_Upload_file') }}</span></span>
+          </a-button>
+          <input
+            type="file"
+            ref="fileInput"
+            accept=".csv, .xls, .xlsx"
+            style="display: none"
+            @change="handleFileUpload"
+          />
+          <a-button type="primary" class="w-full sm:w-auto" @click="onAdd">
+            <span class="material-symbols-outlined">add <span class="ml-2">{{ $t('l_Add_pregnant') }}</span></span>
+          </a-button>
         </div>
-
-        <!-- Блок фильтров -->
-        <transition name="fade">
-          <div v-if="showFilters" class="filters-panel">
-            <a-select
-              v-model:value="filters.trimester"
-              :placeholder="$t('l_Trimester')"
-              class="filter-select"
-              allowClear
-              @change="fetchPregnantWomen"
-            >
-              <a-select-option value="1">1</a-select-option>
-              <a-select-option value="2">2</a-select-option>
-              <a-select-option value="3">3</a-select-option>
-            </a-select>
-
-            <a-select
-              v-model:value="filters.monitoring_week"
-              :placeholder="$t('l_Monitoring_week')"
-              class="filter-select"
-              allowClear
-              @change="fetchPregnantWomen"
-            >
-              <a-select-option value="12">12</a-select-option>
-              <a-select-option value="32">32</a-select-option>
-            </a-select>
-
-            <a-select
-              v-model:value="filters.has_risk"
-              :placeholder="$t('l_Risk_status')"
-              class="filter-select"
-              allowClear
-              @change="fetchPregnantWomen"
-            >
-              <a-select-option value="true">{{ $t("l_Yes") }}</a-select-option>
-              <a-select-option value="false">{{ $t("l_No") }}</a-select-option>
-            </a-select>
-          </div>
-        </transition>
       </template>
     </a-page-header>
 
@@ -94,13 +124,12 @@
         :pagination="pagination"
         rowKey="id"
         :loading="loading"
+        :scroll="{ x: 'max-content' }"
         @change="handleTableChange"
-        @rowClick="(record) => toDetail(record.id)"
-        :rowClassName="() => 'clickable-row'"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'full_name'">
-            <span class="clickable-text" @click.stop="toDetail(record.id)">
+            <span class="clickable-text" @click.stop="onOpenDetails(record.id)">
               {{ record.full_name }}
             </span>
           </template>
@@ -108,7 +137,7 @@
           <template v-else-if="column.key === 'Action'">
             <a-space>
               <img
-                class="w-[25px] mr-4"
+                class="w-[25px] mr-4 cursor-pointer hover:opacity-70"
                 src="../../assets/edit.png"
                 @click.stop="onEdit(record)"
               />
@@ -120,16 +149,11 @@
                 @confirm="onDelete(record.id)"
               >
                 <img
-                  class="w-[25px]"
+                  class="w-[25px] cursor-pointer hover:opacity-70"
                   src="../../assets/delete.png"
                   @click.stop
                 />
               </a-popconfirm>
-              <!-- <img
-                class="w-[15px]"
-                src="../../assets/essay.png"
-                @click.stop="toDetail(record.id)"
-              /> -->
             </a-space>
           </template>
         </template>
@@ -151,19 +175,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, h } from "vue";
 import { message } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import AddEditPregnant from "./AddEditPregnant.vue";
 import PregnantDetail from "./PregnantDetail.vue";
-import dayjs from "dayjs"; // добавляем для форматирования дат
+import dayjs from "dayjs";
+import type { TableRenderProps } from "../../types/table";
 const { t: $t } = useI18n();
 
-const showFilters = ref(false);
 const detailVisible = ref(false);
 const selectedId = ref<string | null>(null);
-const toDetail = (id: string) => {
+const onOpenDetails = (id: string) => {
   selectedId.value = id;
   detailVisible.value = true;
 };
@@ -189,7 +213,8 @@ type Pregnant = {
 };
 
 const search = ref("");
-const filters = ref<Record<string, any>>({});
+const currentFilters = ref<Record<string, any>>({});
+const filtersOpen = ref(false);
 const tableData = ref<Pregnant[]>([]);
 const loading = ref(false);
 const modalVisible = ref(false);
@@ -211,23 +236,41 @@ const columns = [
     title: "#",
     key: "index",
     width: 50,
+    responsive: ["sm"],
     customRender: ({ index }: { index: number }) =>
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
   },
-  { title: $t("l_Full_name"), dataIndex: "full_name" },
-  { title: $t("l_IIN"), dataIndex: "iin" },
-  { title: $t("l_Birth_date"), dataIndex: "birth_date" },
-  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks" },
-
-  { title: $t("l_Address"), dataIndex: "address" },
-  { title: $t("l_Organization"), dataIndex: "organization_name" },
+  {
+    title: $t("l_Full_name"),
+    dataIndex: "full_name",
+    customRender: ({ text, record }: TableRenderProps<Pregnant>) =>
+      h(
+        "span",
+        {
+          class: "cursor-pointer hover:text-blue-600 underline transition",
+          onClick: () => onOpenDetails(record.id),
+        },
+        text
+      ),
+  },
+  { title: $t("l_IIN"), dataIndex: "iin", responsive: ["sm"] },
+  {
+    title: $t("l_Birth_date"),
+    dataIndex: "birth_date",
+    responsive: ["sm"],
+    customRender: ({ text }: TableRenderProps<Pregnant>) =>
+      text ? dayjs(text).format("DD.MM.YYYY") : "",
+  },
+  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks", responsive: ["md"] , width:"100px"},
+  { title: $t("l_Address"), dataIndex: "address", responsive: ["lg"], ellipsis: true },
+  { title: $t("l_Organization"), dataIndex: "organization_name", responsive: ["md"], ellipsis: true },
   {
     title: $t("l_Visit_date"),
     dataIndex: "visit_date",
-    customRender: ({ text }: { text: string }) =>
+    responsive: ["sm"],
+    customRender: ({ text }: TableRenderProps<Pregnant>) =>
       text ? dayjs(text).format("DD.MM.YYYY") : "",
   },
-  // { title: $t("l_Monitoring_category"), dataIndex: "monitoring_category" },
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
 
@@ -255,7 +298,7 @@ const downloadTemplate = async () => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "pregnant_template.csv");
+    link.setAttribute("download", "pregnant_template.xlsx");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -273,7 +316,7 @@ const downloadExcel = async () => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "pregnant_list.csv");
+    link.setAttribute("download", "pregnant_list.xlsx");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -308,9 +351,12 @@ const fetchPregnantWomen = async () => {
       page: pagination.value.current,
       page_size: pagination.value.pageSize,
     };
-    if (search.value.trim()) queryParams.search = search.value;
-    Object.entries(filters.value).forEach(([key, val]) => {
-      if (val) queryParams[key] = val;
+    if (search.value.trim()) queryParams.search = search.value.trim();
+    if (Object.keys(currentFilters.value).length > 0)
+      Object.assign(queryParams, currentFilters.value);
+    Object.keys(queryParams).forEach((key) => {
+      if (queryParams[key] === "" || queryParams[key] == null)
+        delete queryParams[key];
     });
     const { data } = await PregnantApi("", queryParams, "GET");
     tableData.value = data.items;
@@ -333,6 +379,22 @@ const onEdit = (record: Pregnant) => {
   modalVisible.value = true;
 };
 
+const applyFilters = () => {
+  pagination.value.current = 1;
+  filtersOpen.value = false;
+  fetchPregnantWomen();
+};
+
+const resetFilters = () => {
+  currentFilters.value = {};
+  pagination.value.current = 1;
+  filtersOpen.value = false;
+  fetchPregnantWomen();
+};
+
+const getPopupContainer = (triggerNode: HTMLElement) =>
+  triggerNode?.parentElement || document.body;
+
 onMounted(fetchPregnantWomen);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
@@ -348,84 +410,12 @@ watch(search, (val) => {
 </script>
 
 <style scoped>
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.ant-page-header :deep(.ant-page-header-heading-title) {
+  display: block;
 }
-
-.search-input {
-  width: 250px;
-}
-
-.filters-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.filter-select {
-  width: 120px;
-}
-
-.buttons-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.action-btn {
-  white-space: nowrap;
-}
-
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.clickable-row {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.clickable-row:hover {
-  background-color: #f5f5f5;
-}
-
-.clickable-text {
-  color: #1890ff;
-  cursor: pointer;
-}
-.clickable-text:hover {
-  text-decoration: underline;
-  color: #40a9ff;
-}
-
 @media (max-width: 1024px) {
-  .search-input {
-    width: 100%;
-  }
-  .filter-select {
-    width: 48%;
-  }
-}
-
-@media (max-width: 768px) {
-  .header-actions {
-    flex-direction: column;
-  }
-  .filters-panel {
-    flex-direction: column;
-  }
-  .filter-select {
-    width: 100%;
-  }
-  .buttons-group {
-    flex-direction: column;
-    width: 100%;
-  }
-  .action-btn {
-    width: 100%;
+  .ant-page-header :deep(.ant-page-header-heading-title) {
+    display: none;
   }
 }
 .search-input :deep(.ant-input-search-button) {
@@ -437,5 +427,17 @@ watch(search, (val) => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+.clickable-text {
+  color: #1890ff;
+  cursor: pointer;
+}
+.clickable-text:hover {
+  text-decoration: underline;
+  color: #40a9ff;
 }
 </style>

@@ -56,6 +56,8 @@ export default {
   l_Visit_date: "Visit date",
   l_Due_date_12_weeks: "Due date (12 weeks)",
   l_Pregnancy_weeks: "Pregnancy weeks",
+  l_Pregnancy_weeks_min: "Min pregnancy weeks",
+  l_Pregnancy_weeks_max: "Max pregnancy weeks",
   l_Monitoring_category: "Monitoring category",
   survey_info_intro:
     "Create new monitoring survey for a specific pregnant woman.",
@@ -79,6 +81,9 @@ export default {
   l_Social_risks: "Social risks",
   l_Download_excel: "Download Excel",
   l_Filter: "Filter",
+  l_Age_group: "Age group",
+  l_Apply_filters: "Apply filters",
+  l_Has_surveys: "Has surveys",
   l_Name: "Name",
   l_Weeks_of_pregnancy: "Weeks of pregnancy",
   l_Total_score: "Total score",

@@ -44,6 +44,8 @@ export default {
   l_Visit_date: "Дата визита",
   l_Due_date_12_weeks: "Предполагаемая дата родов (12 недель)",
   l_Pregnancy_weeks: "Текущая недели беременности",
+  l_Pregnancy_weeks_min: "Мин. недели беременности",
+  l_Pregnancy_weeks_max: "Макс. недели беременности",
   l_Monitoring_category: "Категория мониторинга",
   survey_info_intro:
     "Создание нового мониторингового опроса для конкретной беременной женщины.",
@@ -70,6 +72,9 @@ export default {
   l_Due_date: "Планируемый день рожание",
   l_Download_excel: "Скачать Excel",
   l_Filter: "Фильтр",
+  l_Age_group: "Возрастная группа",
+  l_Apply_filters: "Применить фильтры",
+  l_Has_surveys: "Есть анкеты",
   l_Name: "Имя",
   l_Weeks_of_pregnancy: "Недели беременности",
   l_Total_score: "Общий балл",

@@ -1,26 +1,143 @@
 <template>
   <div>
+    <!-- Мобильный/планшетный заголовок -->
+    <div class="block lg:hidden px-3 ">
+      <span class="text-xl font-bold mb-2">{{ $t("l_Kids") }}</span>
+    </div>
     <!-- Заголовок и инструменты -->
     <a-page-header :title="$t('l_Kids')">
       <template #extra>
-        <div class="flex flex-wrap items-center gap-3">
+        <div
+          class="flex flex-wrap gap-3 w-full flex-col sm:flex-row items-stretch sm:items-center sm:justify-end"
+        >
           <!-- Поиск -->
           <a-input-search
             v-model:value="search"
             :placeholder="$t('l_Search_placeholder')"
-            style="width: 400px"
-            class="search-input"
+            class="search-input w-full sm:w-[400px]"
             @search="fetchKids"
             allowClear
           />
+          <!-- Фильтры -->
+          <a-popover
+            trigger="click"
+            v-model:open="filtersOpen"
+            placement="bottomLeft"
+          >
+            <template #content>
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-[92vw] max-w-[420px]"
+              >
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.age_group"
+                    :placeholder="$t('l_Age_group')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="newborn"
+                      >новорожденный</a-select-option
+                    >
+                    <a-select-option value="14_days">14 дней</a-select-option>
+                    <a-select-option value="5_months"
+                      >1,5 месяца</a-select-option
+                    >
+                    <a-select-option value="9_months"
+                      >5 месяцев</a-select-option
+                    >
+                    <a-select-option value="3-5y">9 месяцев</a-select-option>
+                    <a-select-option value="1_year_3_months"
+                      >1 год и 3 месяца</a-select-option
+                    >
+                    <a-select-option value="1_year_9_months"
+                      >1 год и 9 месяцев</a-select-option
+                    >
+                    <a-select-option value="2_years_3_months"
+                      >2 года и 9 месяцев</a-select-option
+                    >
+                  </a-select>
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.gender"
+                    :placeholder="$t('l_Gender')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="male">{{
+                      $t("l_Male")
+                    }}</a-select-option>
+                    <a-select-option value="female">{{
+                      $t("l_Female")
+                    }}</a-select-option>
+                  </a-select>
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.has_risk"
+                    :placeholder="$t('l_Risk_status')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="true">{{
+                      $t("l_Yes")
+                    }}</a-select-option>
+                    <a-select-option value="false">{{
+                      $t("l_No")
+                    }}</a-select-option>
+                  </a-select>
+                </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.has_surveys"
+                    :placeholder="$t('l_Has_surveys')"
+                    allowClear
+                    class="w-full"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="true">{{
+                      $t("l_Yes")
+                    }}</a-select-option>
+                    <a-select-option value="false">{{
+                      $t("l_No")
+                    }}</a-select-option>
+                  </a-select>
+                </div>
+                <div class="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                  <a-button class="w-full sm:w-auto" @click="resetFilters">{{ $t("l_Reset") }}</a-button>
+                  <a-button class="w-full sm:w-auto" type="primary" @click="applyFilters">{{
+                    $t("l_Apply_filters")
+                  }}</a-button>
+                </div>
+              </div>
+            </template>
+            <a-button class="w-full sm:w-auto min-w-[150px]" type="primary" ghost
+              ><span class="icon active material-symbols-outlined">
+                filter_alt
+                <span>{{ $t("l_Filter") }}</span></span
+              >
+            </a-button>
+          </a-popover>
+          <a-button @click="downloadExcel" class="w-full sm:w-auto"
+            >📄 {{ $t("l_Download_excel") }}</a-button
+          >
           <!-- В шапке extra -->
-          <a-button @click="downloadTemplate">
+          <a-button class="w-full sm:w-auto" @click="downloadTemplate">
             <span class="ml-2">📄 {{ $t("l_Download_template") }}</span>
           </a-button>
 
           <!-- Загрузка Excel -->
-          <a-button type="primary" @click="fileInput?.click()">
-            <span class="ml-2">{{ $t('l_Upload_file') }}</span>
+          <a-button
+           
+            class="w-full sm:w-auto"
+            @click="fileInput?.click()"
+          >
+          <span class="material-symbols-outlined">
+upload
+  <span class="ml-2">{{ $t("l_Upload_file") }}</span></span>
           </a-button>
           <input
             type="file"
@@ -30,7 +147,7 @@
             @change="handleFileUpload"
           />
           <!-- Добавить ребёнка -->
-          <a-button type="primary" @click="onAddKid">
+          <a-button type="primary" class="w-full sm:w-auto" @click="onAddKid">
             <span class="material-symbols-outlined">
               add <span class="ml-2">{{ $t("l_Add_children") }}</span>
             </span>
@@ -47,6 +164,7 @@
       :pagination="pagination"
       rowKey="id"
       :loading="loading"
+      :scroll="{ x: 'max-content' }"
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
@@ -128,6 +246,7 @@ const detailsVisible = ref(false);
 const selectedKid = ref<string | null>(null);
 
 const fileInput = ref<HTMLInputElement | null>(null);
+const filtersOpen = ref(false);
 
 const pagination = ref({
   current: 1,
@@ -142,14 +261,32 @@ const pagination = ref({
 const onOpenDetails = (id: string) => {
   selectedKid.value = id;
   detailsVisible.value = true;
-  console.log(selectedKid)
+  console.log(selectedKid);
 };
-
+const downloadExcel = async () => {
+  try {
+    const response = await KidsApi("download/", {}, "GET", {
+      fileDownload: true,
+    });
+    const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "kids_list.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch {
+    message.error($t("l_File_download_failed"));
+  }
+};
 const columns = [
   {
     title: "#",
     key: "index",
     width: "50px",
+    responsive: ["sm"],
     customRender: ({ index }: { index: number }) =>
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
   },
@@ -178,7 +315,7 @@ const columns = [
         h(
           "span",
           {
-            class: "cursor-pointer hover:text-blue-600 transition",
+            class: "cursor-pointer hover:text-blue-600 underline transition",
             onClick: () => onOpenDetails(record.id),
           },
           text
@@ -189,10 +326,12 @@ const columns = [
   {
     title: $t("l_IIN"),
     dataIndex: "iin",
+    responsive: ["sm"],
   },
   {
     title: $t("l_Birth_date"),
     dataIndex: "birth_date",
+    responsive: ["sm"],
     customRender: ({ text }: TableRenderProps<Kid>) => {
       const { $formatIsoDate } = useGlobal();
       return $formatIsoDate(text);
@@ -201,6 +340,7 @@ const columns = [
   {
     title: $t("l_Gender"),
     dataIndex: "gender",
+    responsive: ["md"],
     customRender: ({ text }: TableRenderProps<Kid>) => {
       const genderLower = String(text).toLowerCase();
       if (genderLower === "male")
@@ -213,14 +353,19 @@ const columns = [
   {
     title: $t("l_Address"),
     dataIndex: "address",
+    responsive: ["lg"],
+    ellipsis: true,
   },
   {
     title: $t("l_Organization"),
     dataIndex: "organization_name",
+    responsive: ["md"],
+    ellipsis: true,
   },
   {
     title: $t("l_Age_months"),
     dataIndex: "age_months",
+    responsive: ["md"],
   },
   {
     title: $t("l_Actions"),
@@ -255,7 +400,7 @@ const downloadTemplate = async () => {
 
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "children_template.csv");
+    link.setAttribute("download", "children_template.xlsx");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -332,6 +477,22 @@ const onEdit = (record: Kid) => {
   modalVisible.value = true;
 };
 
+const applyFilters = () => {
+  pagination.value.current = 1;
+  filtersOpen.value = false;
+  fetchKids();
+};
+
+const resetFilters = () => {
+  currentFilters.value = {};
+  pagination.value.current = 1;
+  filtersOpen.value = false;
+  fetchKids();
+};
+
+const getPopupContainer = (triggerNode: HTMLElement) =>
+  triggerNode?.parentElement || document.body;
+
 onMounted(fetchKids);
 
 let searchTimeout: ReturnType<typeof setTimeout>;
@@ -347,6 +508,17 @@ watch(search, (newValue) => {
 </script>
 
 <style scoped>
+.ant-page-header :deep(.ant-page-header-heading-title) {
+  /* По умолчанию показываем заголовок внутри PageHeader */
+  display: block;
+}
+@media (max-width: 1024px) {
+  .ant-page-header :deep(.ant-page-header-heading-title) {
+    /* На мобильных и планшетах скрываем встроенный заголовок,
+       используем кастомный сверху */
+    display: none;
+  }
+}
 .search-input :deep(.ant-input-search-button) {
   display: flex;
   align-items: center;

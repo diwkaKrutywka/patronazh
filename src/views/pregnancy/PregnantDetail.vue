@@ -3,16 +3,16 @@
     :visible="visible"
     :title="$t('l_Pregnant_women')"
     placement="right"
-    width="800"
+    :width="drawerWidth"
     @close="$emit('close')"
   >
     <!-- Основная информация -->
     <a-descriptions
       bordered
-      column="3"
+      :column="1"
       size="small"
       v-if="data"
-      layout="vertical"
+      layout="horizontal"
     >
       <a-descriptions-item :label="$t('l_Full_name')"><a-tag color="green">{{
         data.full_name
@@ -56,9 +56,9 @@
 
     <!-- Список анкет -->
     <template v-if="data">
-      <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
+      <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200 flex-col sm:flex-row gap-3">
         <h3>{{ $t("l_Surveys") }}</h3>
-        <a-button type="primary" @click="onAddSurvey">
+        <a-button type="primary" class="w-full sm:w-auto" @click="onAddSurvey">
           <span class="material-symbols-outlined">
             add <span class="ml-2"> {{ $t("l_Add_survey") }}</span>
           </span>
@@ -73,6 +73,7 @@
           :loading="loadingSurveys"
           :pagination="pagination"
           @change="handleTableChange"
+          :scroll="{ x: 'max-content' }"
           bordered
         >
           <template #bodyCell="{ column, record }">
@@ -119,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import { SurveysApi } from "../../api/survey";
@@ -140,6 +141,25 @@ const props = defineProps<{
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
+// Responsive drawer width
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
+const onResize = () => {
+  windowWidth.value = window.innerWidth;
+};
+onMounted(() => window.addEventListener('resize', onResize));
+onUnmounted(() => window.removeEventListener('resize', onResize));
+const drawerWidth = computed(() => {
+  if (windowWidth.value < 480) return '100%';
+  if (windowWidth.value < 768) return '90%';
+  if (windowWidth.value < 1024) return '70%';
+  return 800;
+});
+// Responsive description columns
+const descriptionsColumns = computed(() => {
+  if (windowWidth.value < 480) return 1;
+  if (windowWidth.value < 768) return 2;
+  return 3;
+});
 const pagination = ref({
   current: 1,
   pageSize: 10,

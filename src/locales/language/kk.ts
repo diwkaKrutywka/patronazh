@@ -52,6 +52,8 @@ export default {
   l_Visit_date: "Келу күні",
   l_Due_date_12_weeks: "Болжамды босану күні (12 апта)",
   l_Pregnancy_weeks: "Жүктілік аптасы",
+  l_Pregnancy_weeks_min: "Мин. жүктілік аптасы",
+  l_Pregnancy_weeks_max: "Макс. жүктілік аптасы",
   l_Monitoring_category: "Бақылау санаты",
   survey_info_intro:
     "Белгілі бір жүкті әйелге арналған жаңа мониторингтік сауалнама құру.",
@@ -75,6 +77,9 @@ export default {
   l_Social_risks: "Әлеуметтік қауіптер",
   l_Download_excel: "Excel жүктеу",
   l_Filter: "Сүзгі",
+  l_Age_group: "Жас тобы",
+  l_Apply_filters: "Сүзгілерді қолдану",
+  l_Has_surveys: "Сауалнамалар бар",
   l_Name: "Аты",
   l_Weeks_of_pregnancy: "Жүктіліктің аптасы",
   l_Total_score: "Жалпы балл",

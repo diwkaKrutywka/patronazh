@@ -3,16 +3,16 @@
     :visible="visible"
     :title="$t('l_Kids')"
     placement="right"
-    width="800"
+    :width="drawerWidth"
     @close="$emit('close')"
   >
     <!-- Основная информация о ребёнке -->
     <a-descriptions
       bordered
-      column="3"
+      :column="1"
       size="small"
-     v-if="data"
-      layout="vertical"
+      v-if="data"
+      layout="horizontal"
     >
       <a-descriptions-item :label="$t('l_Full_name')">
        <a-tag color="green">{{ data.full_name }}</a-tag> 
@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, h } from "vue";
+import { ref, watch, h, computed, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { message } from "ant-design-vue";
 import { KidsApi } from "../../api/kids";
@@ -138,6 +138,36 @@ const props = defineProps<{
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
+
+// ======== Responsive settings ========
+const windowWidth = ref<number>(typeof window !== "undefined" ? window.innerWidth : 1024);
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  updateWindowWidth();
+  window.addEventListener("resize", updateWindowWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updateWindowWidth);
+});
+
+const isMobile = computed(() => windowWidth.value < 640);
+const isTablet = computed(() => windowWidth.value >= 640 && windowWidth.value < 1024);
+
+const drawerWidth = computed<string | number>(() => {
+  if (isMobile.value) return "100%";
+  if (isTablet.value) return 640;
+  return 800;
+});
+
+const descColumns = computed<number>(() => {
+  if (isMobile.value) return 1;
+  if (isTablet.value) return 2;
+  return 3;
+});
 
 // ======== Пагинация ========
 const pagination = ref({
