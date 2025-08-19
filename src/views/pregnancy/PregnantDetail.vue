@@ -17,9 +17,9 @@
       <a-descriptions-item :label="$t('l_Full_name')"><a-tag color="green">{{
         data.full_name
       }}</a-tag></a-descriptions-item>
-      <a-descriptions-item :label="$t('l_IIN')">{{
+      <a-descriptions-item :label="$t('l_IIN')"><a-tag color="gray">{{
         data.iin
-      }}</a-descriptions-item>
+      }}</a-tag></a-descriptions-item>
       <a-descriptions-item :label="$t('l_Birth_date')">{{
         data.birth_date
       }}</a-descriptions-item>
@@ -192,12 +192,12 @@ const surveyColumns = [
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
   },
   { title: $t("l_Fill_date"), dataIndex: "fill_date" },
-  { title: $t("l_IIN"), dataIndex: "woman_iin" },
-  { title: $t("l_Name"), dataIndex: "woman_name" },
-  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks" },
-  { title: $t("l_Organization"), dataIndex: "organization_name" },
-  { title: $t("l_Total_score"), dataIndex: "total_score" },
-  { title: $t("l_Max_score"), dataIndex: "max_score" },
+  // { title: $t("l_IIN"), dataIndex: "woman_iin" },
+  // { title: $t("l_Name"), dataIndex: "woman_name" },
+  // { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks", width:"100px" },
+  // { title: $t("l_Organization"), dataIndex: "organization_name" },
+  { title: $t("l_Total_score"), dataIndex: "total_score", width:"100px" },
+  { title: $t("l_Max_score"), dataIndex: "max_score", width:"100px" },
   {
     title: $t("l_Risk_level"),
     dataIndex: "risk_level",

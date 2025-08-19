@@ -18,7 +18,7 @@
        <a-tag color="green">{{ data.full_name }}</a-tag> 
       </a-descriptions-item>
       <a-descriptions-item :label="$t('l_IIN')">
-        {{ data.iin }}
+       <a-tag color="gray">{{ data.iin }}</a-tag> 
       </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Birth_date')">
         {{ data.birth_date }}
@@ -195,9 +195,9 @@ const surveyColumns = [
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
   },
   { title: $t("l_Fill_date"), dataIndex: "fill_date" },
-  { title: $t("l_IIN"), dataIndex: "child_iin" },
-  { title: $t("l_Name"), dataIndex: "child_name" },
-  { title: $t("l_Organization"), dataIndex: "organization_name" },
+  // { title: $t("l_IIN"), dataIndex: "child_iin" },
+  // { title: $t("l_Name"), dataIndex: "child_name" },
+  // { title: $t("l_Organization"), dataIndex: "organization_name" },
   { title: $t("l_Total_score"), dataIndex: "total_score" },
   { title: $t("l_Max_score"), dataIndex: "max_score" },
   {
