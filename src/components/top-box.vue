@@ -38,7 +38,7 @@
 
         <div
           v-show="isUserDropdownOpen"
-          class="absolute right-0 mt-2 w-72 bg-white text-gray-900 rounded-xl shadow-2xl z-50 border border-gray-200 overflow-hidden"
+          class="absolute right-0 mt-2 w-96 bg-white text-gray-900 rounded-xl shadow-2xl z-50 border border-gray-200 overflow-hidden"
         >
           <div
             class="flex flex-col items-center p-6 pb-4 bg-gradient-to-b from-blue-50 to-white"
@@ -59,11 +59,21 @@
             >
               {{ userStore.user?.email }}
             </div>
-            <div class="flex flex-col gap-1 w-full">
+            <div class="flex flex-col w-full divide-y">
               <template v-for="([key, value], idx) in filteredUserEntries" :key="key + '_' + idx">
-                <div>
-                  <span class="text-xs text-gray-400 uppercase tracking-wider">{{ key }}</span>
-                  <span class="text-sm text-gray-700">{{ value }}</span>
+                <div class="flex items-start justify-between gap-3 py-1.5"  v-if="key!='id' && key!='organization_id'">
+                  <span class="text-[11px] text-gray-400 uppercase tracking-wider w-44 shrink-0" >{{ getLabel(key) }}</span>
+                  <span class="text-sm text-gray-700 truncate max-w-[18rem] md:max-w-[24rem]"  :title="value">
+                    <template v-if="value === 'true'">
+                      <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">{{ $t('l_Yes') }}</span>
+                    </template>
+                    <template v-else-if="value === 'false'">
+                      <span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">{{ $t('l_No') }}</span>
+                    </template>
+                    <template v-else>
+                      {{ value }}
+                    </template>
+                  </span>
                 </div>
               </template>
             </div>
@@ -73,7 +83,7 @@
             @click="onSignOut"
           >
             <span class="material-symbols-outlined">logout</span>
-            Sign Out
+            {{ $t('l_Sign_out') }}
           </div>
         </div>
       </div>
@@ -89,6 +99,7 @@ import { storeToRefs } from "pinia";
 import {  ref, computed } from "vue";
 import { onMounted, onUnmounted } from "vue";
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 
 const emit = defineEmits(["toggle-drawer"]);
@@ -139,4 +150,30 @@ const filteredUserEntries = computed(() => {
   }
   return result;
 });
+
+// Map raw user keys to i18n labels
+const labelKeyByUserField: Record<string, string> = {
+  is_supervisor: 'user_label_is_supervisor',
+  role: 'user_label_role',
+  organization: 'user_label_organization',
+  org: 'user_label_organization',
+  department: 'user_label_department',
+  position: 'user_label_position',
+  phone: 'user_label_phone',
+  code: 'user_label_code',
+  nurse_code: 'user_label_nurse_code',
+  region: 'user_label_region',
+  district: 'user_label_district',
+  branch: 'user_label_branch',
+  
+};
+
+const getLabel = (key: string): string => {
+  const tKey = labelKeyByUserField[key];
+  const { t } = useI18n();
+  if (tKey) return t(tKey) as string;
+  // Fallback: prettify unknown keys
+  const pretty = key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  return pretty;
+};
 </script>

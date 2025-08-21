@@ -3,14 +3,13 @@
     <a-page-header :title="$t('l_Reports')"> </a-page-header>
 
     <a-typography-text type="secondary" class="mr-4">
-      Выберите способ фильтрации дат (либо по месяцу и году, либо по диапазону
-      дат).
+      {{ $t('report_hint_select_filter') }}
     </a-typography-text>
 
     <!-- Переключатель -->
     <a-radio-group v-model:value="dateMode" class="mb-4">
-      <a-radio-button value="month-year">По месяцу и году</a-radio-button>
-      <a-radio-button value="range">По диапазону дат</a-radio-button>
+      <a-radio-button value="month-year">{{ $t('report_mode_month_year') }}</a-radio-button>
+      <a-radio-button value="range">{{ $t('report_mode_range') }}</a-radio-button>
     </a-radio-group>
 
     <div class="flex gap-4 mt-4 flex-col md:flex-row">
@@ -18,7 +17,7 @@
       <div class="flex gap-2 mb-4 md:mb-0">
         <a-select
           v-model:value="month"
-          placeholder="Месяц"
+          :placeholder="$t('report_placeholder_month')"
           style="width: 150px"
           :disabled="dateMode !== 'month-year'"
         >
@@ -30,7 +29,7 @@
           v-model:value="year"
           :min="2020"
           :max="dayjs().year()"
-          placeholder="Год"
+          :placeholder="$t('report_placeholder_year')"
           style="width: 120px"
           :disabled="dateMode !== 'month-year'"
         />
@@ -50,27 +49,27 @@
     <!-- Кнопки / Карточки -->
     <a-row :gutter="16" class="mt-6">
       <a-col :xs="24" :md="12" :xl="8" class="mb-4">
-        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
+        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
               <FileExcelOutlined />
-              <span>Прогрессивный пакет</span>
+              <span>{{ $t('report_pkg_progressive_title') }}</span>
             </div>
           </template>
           <a-typography-paragraph class="mb-4">
-            Отчёты для случаев с выявленным риском.
+            {{ $t('report_pkg_progressive_desc') }}
           </a-typography-paragraph>
           <a-space>
             <a-button
               type="primary"
               size="large"
               :loading="downloading === 'progressive-package'"
-              :disabled="!!downloading"
+              :disabled="!!downloading && downloading === 'progressive-package'"
               @click="downloadReport('progressive-package')"
             >
               <span class="material-symbols-outlined">
                 download
-                <span>Скачать</span>
+                <span>{{ $t('report_btn_download') }}</span>
               </span>
             </a-button>
           </a-space>
@@ -78,27 +77,27 @@
       </a-col>
 
       <a-col :xs="24" :md="12" :xl="8" class="mb-4">
-        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
+        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
               <FileExcelOutlined />
-              <span>Универсальный пакет</span>
+              <span>{{ $t('report_pkg_universal_title') }}</span>
             </div>
           </template>
           <a-typography-paragraph class="mb-4">
-            Сводные отчёты по всем случаям за выбранный период.
+            {{ $t('report_pkg_universal_desc') }}
           </a-typography-paragraph>
           <a-space>
             <a-button
               type="primary"
               size="large"
               :loading="downloading === 'universal-package'"
-              :disabled="!!downloading"
+              :disabled="!!downloading && downloading === 'universal-package'"
               @click="downloadReport('universal-package')"
             >
               <span class="material-symbols-outlined">
                 download
-                <span>Скачать</span>
+                <span>{{ $t('report_btn_download') }}</span>
               </span>
             </a-button>
           </a-space>
@@ -106,37 +105,28 @@
       </a-col>
 
       <a-col :xs="24" :md="12" :xl="8" class="mb-4">
-        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
+        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff'}" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
               <FileExcelOutlined />
-              <span>Ежедневник патронажной сестры</span>
+              <span>{{ $t('report_nurse_diary_title') }}</span>
             </div>
           </template>
           <a-typography-paragraph class="mb-3">
-            Скачать ежедневник патронажной сестры по выполнению плана универсальных посещений.
+            {{ $t('report_nurse_diary_desc') }}
           </a-typography-paragraph>
-          <ul class="list-disc pl-5 text-sm text-gray-600 mb-3">
-            <li>Включает все анкеты всех медсестер организации</li>
-            <li>Объединяет анкеты детей и беременных женщин</li>
-            <li>Показывает кто из медсестер заполнил каждую анкету</li>
-            <li>Детальная оценка по каждому критерию риска (0-2)</li>
-            <li>Цветовая индикация уровней риска</li>
-          </ul>
-          <div class="text-xs text-gray-500 mb-4">
-            Период: start_date и end_date или month и year
-          </div>
+         
           <a-space>
             <a-button
               type="primary"
               size="large"
               :loading="downloading === 'nurse-diary-universal'"
-              :disabled="!!downloading"
+              :disabled="!!downloading && downloading === 'nurse-diary-universal'"
               @click="downloadReport('nurse-diary-universal')"
             >
               <span class="material-symbols-outlined">
                 download
-                <span>Скачать</span>
+                <span>{{ $t('report_btn_download') }}</span>
               </span>
             </a-button>
           </a-space>
