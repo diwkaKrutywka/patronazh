@@ -25,7 +25,7 @@ export default {
   l_Lock: "Заблокировать",
   l_Unlock: "Разблокировать",
   l_Unlock_user: "Разблокировать пользователя",
-  l_Pregnancy: "Беременность",
+  l_Pregnancy: "Беременные",
   l_Kids: "Дети",
   l_Add_kids: "Добавить детей",
   l_Add_pregnant: "Добавить беременность",

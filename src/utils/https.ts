@@ -30,10 +30,8 @@ http.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         // Пытаемся обновить токен
-        const refreshResp = await axios.post(
-          'https://rapidly-magnetic-seahorse.ngrok-free.app/auth/api/v1/auth/refresh',
-          { refresh_token: store.refreshToken }
-        )
+        const refreshUrl = `${http.defaults.baseURL}auth/refresh/`
+        const refreshResp = await axios.post(refreshUrl, { refresh_token: store.refreshToken })
 
         const { access_token, refresh_token } = refreshResp.data
         store.setTokens(access_token, refresh_token)

@@ -88,6 +88,7 @@ import { useUserStore } from "../store/index";
 import { storeToRefs } from "pinia";
 import {  ref, computed } from "vue";
 import { onMounted, onUnmounted } from "vue";
+import { useRouter } from 'vue-router';
 
 
 const emit = defineEmits(["toggle-drawer"]);
@@ -98,10 +99,15 @@ const toggleUserDropdown = () => {
   isUserDropdownOpen.value = !isUserDropdownOpen.value;
 };
 // router-related code removed as unused
+const router = useRouter();
 
 const onSignOut = () => {
-  //userStore.signOut();
+  userStore.clear();
+  try {
+    localStorage.clear();
+  } catch {}
   isUserDropdownOpen.value = false;
+  router.push('/login');
 };
 const dropdownRef = ref<HTMLElement | null>(null);
 const handleClickOutside = (event: MouseEvent) => {

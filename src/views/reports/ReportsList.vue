@@ -13,9 +13,9 @@
       <a-radio-button value="range">По диапазону дат</a-radio-button>
     </a-radio-group>
 
-    <div class="flex gap-4 mt-4">
+    <div class="flex gap-4 mt-4 flex-col md:flex-row">
       <!-- Вариант 1: месяц + год -->
-      <div class="flex gap-2 mb-4">
+      <div class="flex gap-2 mb-4 md:mb-0">
         <a-select
           v-model:value="month"
           placeholder="Месяц"
@@ -37,7 +37,7 @@
       </div>
 
       <!-- Вариант 2: диапазон дат -->
-      <div class="mb-4">
+      <div class="mb-4 md:mb-0">
         <a-range-picker
           v-model:value="dateRange"
           format="YYYY-MM-DD"
@@ -47,9 +47,9 @@
         />
       </div>
     </div>
-    <!-- Кнопки -->
+    <!-- Кнопки / Карточки -->
     <a-row :gutter="16" class="mt-6">
-      <a-col :xs="24" :md="12" :xl="8">
+      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
         <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
           <template #title>
             <div class="flex items-center gap-2">
@@ -77,7 +77,7 @@
         </a-card>
       </a-col>
 
-      <a-col :xs="24" :md="12" :xl="8">
+      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
         <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
           <template #title>
             <div class="flex items-center gap-2">
@@ -95,6 +95,44 @@
               :loading="downloading === 'universal-package'"
               :disabled="!!downloading"
               @click="downloadReport('universal-package')"
+            >
+              <span class="material-symbols-outlined">
+                download
+                <span>Скачать</span>
+              </span>
+            </a-button>
+          </a-space>
+        </a-card>
+      </a-col>
+
+      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
+        <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }">
+          <template #title>
+            <div class="flex items-center gap-2">
+              <FileExcelOutlined />
+              <span>Ежедневник патронажной сестры</span>
+            </div>
+          </template>
+          <a-typography-paragraph class="mb-3">
+            Скачать ежедневник патронажной сестры по выполнению плана универсальных посещений.
+          </a-typography-paragraph>
+          <ul class="list-disc pl-5 text-sm text-gray-600 mb-3">
+            <li>Включает все анкеты всех медсестер организации</li>
+            <li>Объединяет анкеты детей и беременных женщин</li>
+            <li>Показывает кто из медсестер заполнил каждую анкету</li>
+            <li>Детальная оценка по каждому критерию риска (0-2)</li>
+            <li>Цветовая индикация уровней риска</li>
+          </ul>
+          <div class="text-xs text-gray-500 mb-4">
+            Период: start_date и end_date или month и year
+          </div>
+          <a-space>
+            <a-button
+              type="primary"
+              size="large"
+              :loading="downloading === 'nurse-diary-universal'"
+              :disabled="!!downloading"
+              @click="downloadReport('nurse-diary-universal')"
             >
               <span class="material-symbols-outlined">
                 download

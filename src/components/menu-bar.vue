@@ -53,12 +53,21 @@
   import { useRoute, useRouter } from 'vue-router'
   import { getMenuList } from '../common/menu-list'
 import type { MenuItem } from '../common/menu-list'
+import { useUserStore } from '../store/index'
 
   const router = useRouter()
   const route = useRoute()
 
   const openPathList = ref<string[]>([])
-  const menuList = ref<MenuItem[]>([])
+  const userStore = useUserStore()
+
+  const menuList = computed<MenuItem[]>(() => {
+    const rawMenu = getMenuList()
+    if (userStore.user && userStore.user.is_supervisor) {
+      return rawMenu
+    }
+    return rawMenu.filter((item) => item.routerPath !== '/reports')
+  })
   
   // Получаем путь текущего маршрута
   const menuPath = computed(() => route.path)
@@ -78,8 +87,7 @@ import type { MenuItem } from '../common/menu-list'
   }
   
   onMounted(() => {
-    const rawMenu = getMenuList()
-    menuList.value = rawMenu
+    // nothing needed here for menu population; menuList is computed
   })
   </script>
   

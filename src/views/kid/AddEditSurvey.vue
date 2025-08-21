@@ -28,13 +28,7 @@
 
     <!-- Форма -->
     <a-form :model="form" layout="vertical">
-      <a-form-item :label="$t('l_Fill_date')">
-        <a-date-picker
-          v-model:value="form.fill_date"
-          value-format="YYYY-MM-DD"
-          style="width: 100%"
-        />
-      </a-form-item>
+     
 
       <!-- 16 критериев -->
       <div class="grid grid-cols-2 gap-4">
@@ -228,7 +222,6 @@ const loading = ref(false);
 
 const form = ref({
   child: "",
-  fill_date: dayjs().format("YYYY-MM-DD"),
   breastfeeding: 0,
   complementary_feeding: 0,
   attachment: 0,

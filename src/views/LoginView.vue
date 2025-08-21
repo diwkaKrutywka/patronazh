@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { Button, Input } from "ant-design-vue"
+import { Button, Input, message } from "ant-design-vue"
 import ChangeLanguageBox from "../components/change-language-box.vue"
 import config from "../config"
 import { ApiApi } from "../api/auth"
@@ -126,9 +126,13 @@ export default {
 
       this.$router.push("/")
     } else {
+      message.error(res.message || 'Ошибка входа')
       console.log(res)
       console.log('error')
     }
+  }).catch((err) => {
+    const msg = err?.response?.data?.message || err?.message || 'Ошибка входа'
+    message.error(msg)
   })
 },
     togglePasswordVisibility() {
