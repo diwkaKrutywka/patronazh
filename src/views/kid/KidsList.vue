@@ -35,30 +35,40 @@
                     allowClear
                     class="w-full"
                     :getPopupContainer="getPopupContainer"
+                    size="small"
                   >
-                    <a-select-option value="newborn"
-                      >новорожденный</a-select-option
-                    >
-                    <a-select-option value="14_days">14 дней</a-select-option>
-                    <a-select-option value="5_months"
-                      >1,5 месяца</a-select-option
-                    >
-                    <a-select-option value="9_months"
-                      >5 месяцев</a-select-option
-                    >
-                    <a-select-option value="3-5y">9 месяцев</a-select-option>
-                    <a-select-option value="1_year_3_months"
-                      >1 год и 3 месяца</a-select-option
-                    >
-                    <a-select-option value="1_year_9_months"
-                      >1 год и 9 месяцев</a-select-option
-                    >
-                    <a-select-option value="2_years_3_months"
-                      >2 года и 9 месяцев</a-select-option
-                    >
+                    <a-select-option value="newborn">{{ $t('age_group_newborn') }}</a-select-option>
+                    <a-select-option value="14_days">{{ $t('age_group_14_days') }}</a-select-option>
+                    <a-select-option value="1_5_months">{{ $t('age_group_1_5_months') }}</a-select-option>
+                    <a-select-option value="5_months">{{ $t('age_group_5_months') }}</a-select-option>
+                    <a-select-option value="9_months">{{ $t('age_group_9_months') }}</a-select-option>
+                    <a-select-option value="15_months">{{ $t('age_group_15_months') }}</a-select-option>
+                    <a-select-option value="21_months">{{ $t('age_group_21_months') }}</a-select-option>
+                    <a-select-option value="33_months">{{ $t('age_group_33_months') }}</a-select-option>
                   </a-select>
                 </div>
+               
+                <!-- <div>
+                  <a-input-number
+                    v-model:value="currentFilters.age_min"
+                    :placeholder="$t('l_Age_min')"
+                    :min="0"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div>
                 <div>
+                  <a-input-number
+                    v-model:value="currentFilters.age_max"
+                    :placeholder="$t('l_Age_max')"
+                    :min="0"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div> -->
+                <!-- <div>
                   <a-select
                     v-model:value="currentFilters.gender"
                     :placeholder="$t('l_Gender')"
@@ -73,13 +83,14 @@
                       $t("l_Female")
                     }}</a-select-option>
                   </a-select>
-                </div>
+                </div> -->
                 <div>
                   <a-select
                     v-model:value="currentFilters.has_risk"
                     :placeholder="$t('l_Risk_status')"
                     allowClear
                     class="w-full"
+                    size="small"
                     :getPopupContainer="getPopupContainer"
                   >
                     <a-select-option value="true">{{
@@ -90,12 +101,34 @@
                     }}</a-select-option>
                   </a-select>
                 </div>
+               
+                <div class="sm:col-span-2">
+                  <a-range-picker
+                    v-model:value="currentFilters.no_surveys_range"
+                    valueFormat="YYYY-MM-DD"
+                    :placeholder="[$t('l_No_surveys_from'), $t('l_No_surveys_to')]"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div>
+                <div class="sm:col-span-2">
+                  <a-range-picker
+                    v-model:value="currentFilters.survey_date_range"
+                    valueFormat="YYYY-MM-DD"
+                    :placeholder="[$t('l_Survey_date_from'), $t('l_Survey_date_to')]"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div>
                 <div>
                   <a-select
                     v-model:value="currentFilters.has_surveys"
                     :placeholder="$t('l_Has_surveys')"
                     allowClear
                     class="w-full"
+                    size="small"
                     :getPopupContainer="getPopupContainer"
                   >
                     <a-select-option value="true">{{
@@ -107,8 +140,8 @@
                   </a-select>
                 </div>
                 <div class="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
-                  <a-button class="w-full sm:w-auto" @click="resetFilters">{{ $t("l_Reset") }}</a-button>
-                  <a-button class="w-full sm:w-auto" type="primary" @click="applyFilters">{{
+                  <a-button size="small" class="w-full sm:w-auto" @click="resetFilters">{{ $t("l_Reset") }}</a-button>
+                  <a-button size="small" class="w-full sm:w-auto" type="primary" @click="applyFilters">{{
                     $t("l_Apply_filters")
                   }}</a-button>
                 </div>
@@ -422,7 +455,7 @@ const handleFileUpload = async (e: Event) => {
 
   try {
     loading.value = true;
-    await KidsApi("upload", formData, "POST", { fileUpload: true });
+    await KidsApi("upload/", formData, "POST", { fileUpload: true });
     message.success($t("l_File_upload_success"));
     fetchKids();
   } catch (error) {
@@ -442,8 +475,41 @@ const fetchKids = async () => {
       page_size: pagination.value.pageSize,
     };
     if (search.value.trim()) queryParams.search = search.value.trim();
-    if (Object.keys(currentFilters.value).length > 0)
-      Object.assign(queryParams, currentFilters.value);
+    if (Object.keys(currentFilters.value).length > 0) {
+      const {
+        age_group,
+        age_min,
+        age_max,
+        gender,
+        has_risk,
+        has_surveys,
+        no_surveys_range,
+        survey_date_range,
+      } = currentFilters.value;
+
+      if (age_group) queryParams.age_group = String(age_group);
+      if (age_min !== undefined && age_min !== null && age_min !== '') {
+        queryParams.age_min = Number(age_min);
+      }
+      if (age_max !== undefined && age_max !== null && age_max !== '') {
+        queryParams.age_max = Number(age_max);
+      }
+      if (gender) queryParams.gender = gender;
+      if (has_risk !== undefined && has_risk !== null && has_risk !== '') {
+        queryParams.has_risk = String(has_risk) === 'true';
+      }
+      if (has_surveys !== undefined && has_surveys !== null && has_surveys !== '') {
+        queryParams.has_surveys = String(has_surveys) === 'true';
+      }
+      if (no_surveys_range && Array.isArray(no_surveys_range) && no_surveys_range.length === 2) {
+        queryParams.no_surveys_from = String(no_surveys_range[0]);
+        queryParams.no_surveys_to = String(no_surveys_range[1]);
+      }
+      if (survey_date_range && Array.isArray(survey_date_range) && survey_date_range.length === 2) {
+        queryParams.survey_date_from = String(survey_date_range[0]);
+        queryParams.survey_date_to = String(survey_date_range[1]);
+      }
+    }
 
     Object.keys(queryParams).forEach((key) => {
       if (queryParams[key] === "" || queryParams[key] == null)

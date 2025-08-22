@@ -298,6 +298,10 @@ const handleSubmit = () => {
   loading.value = true;
   const method = props.surveyId ? "PUT" : "POST";
   const url = props.surveyId ? `children/${props.surveyId}/` : "children/";
+  // Ensure child ID is set for new surveys
+  if (!props.surveyId) {
+    form.value.child = props.childId;
+  }
 
   SurveysApi(url, form.value, method)
     .then(() => {

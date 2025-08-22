@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- Мобильный/планшетный заголовок -->
-    <div class="block lg:hidden px-3 ">
-      <span class="text-xl font-bold mb-2">{{ $t('l_Pregnant_women') }}</span>
+    <div class="block lg:hidden px-3">
+      <span class="text-xl font-bold mb-2">{{ $t("l_Pregnant_women") }}</span>
     </div>
     <a-page-header :title="$t('l_Pregnant_women')">
       <template #extra>
@@ -25,49 +25,46 @@
             placement="bottomLeft"
           >
             <template #content>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-[92vw] max-w-[420px]">
-                
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-[92vw] max-w-[420px]"
+              >
                 <div>
-                  <a-input-number style="width: 100%;"
+                  <a-input-number
+                    style="width: 100%"
                     v-model:value="currentFilters.pregnancy_weeks_min"
                     :placeholder="$t('l_Pregnancy_weeks_min')"
                     class="w-full"
-                    :min="0"
+                    :min="3"
                     :max="50"
+                    size="small"
                   />
                 </div>
                 <div>
-                  <a-input-number style="width: 100%;"
+                  <a-input-number
+                    style="width: 100%"
                     v-model:value="currentFilters.pregnancy_weeks_max"
                     :placeholder="$t('l_Pregnancy_weeks_max')"
                     class="w-full"
-                    :min="0"
+                    size="small"
+                    :min="3"
                     :max="50"
                   />
                 </div>
                 <div>
                   <a-select
-                    v-model:value="currentFilters.trimester"
-                    :placeholder="$t('l_Trimester')"
+                    v-model:value="currentFilters.monitoring_category"
+                    :placeholder="$t('l_Monitoring_category')"
                     allowClear
+                      size="small"
                     class="w-full"
                     :getPopupContainer="getPopupContainer"
                   >
-                    <a-select-option value="1">1</a-select-option>
-                    <a-select-option value="2">2</a-select-option>
-                    <a-select-option value="3">3</a-select-option>
-                  </a-select>
-                </div>
-                <div>
-                  <a-select
-                    v-model:value="currentFilters.monitoring_week"
-                    :placeholder="$t('l_Monitoring_week')"
-                    allowClear
-                    class="w-full"
-                    :getPopupContainer="getPopupContainer"
-                  >
-                    <a-select-option value="12">12</a-select-option>
-                    <a-select-option value="32">32</a-select-option>
+                    <a-select-option value="universal"
+                      >Универсальный</a-select-option
+                    >
+                    <a-select-option value="progressive"
+                      >Прогрессивный</a-select-option
+                    >
                   </a-select>
                 </div>
                 <div>
@@ -75,31 +72,98 @@
                     v-model:value="currentFilters.has_risk"
                     :placeholder="$t('l_Risk_status')"
                     allowClear
+                    size="small"
                     class="w-full"
                     :getPopupContainer="getPopupContainer"
                   >
-                    <a-select-option value="true">{{ $t('l_Yes') }}</a-select-option>
-                    <a-select-option value="false">{{ $t('l_No') }}</a-select-option>
+                    <a-select-option value="true">{{
+                      $t("l_Yes")
+                    }}</a-select-option>
+                    <a-select-option value="false">{{
+                      $t("l_No")
+                    }}</a-select-option>
                   </a-select>
                 </div>
-                <div class="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
-                  <a-button class="w-full sm:w-auto" @click="resetFilters">{{ $t('l_Reset') }}</a-button>
-                  <a-button class="w-full sm:w-auto" type="primary" @click="applyFilters">{{ $t('l_Apply_filters') }}</a-button>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.has_surveys"
+                    :placeholder="$t('l_Has_surveys')"
+                    allowClear
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="true">{{
+                      $t("l_Yes")
+                    }}</a-select-option>
+                    <a-select-option value="false">{{
+                      $t("l_No")
+                    }}</a-select-option>
+                  </a-select>
+                </div>
+                <div class="sm:col-span-2">
+                  <a-range-picker
+                    v-model:value="currentFilters.no_surveys_range"
+                    valueFormat="YYYY-MM-DD"
+                    :placeholder="[
+                      $t('l_No_surveys_from'),
+                      $t('l_No_surveys_to'),
+                    ]"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div>
+                <div class="sm:col-span-2">
+                  <a-range-picker
+                    v-model:value="currentFilters.survey_date_range"
+                    valueFormat="YYYY-MM-DD"
+                    :placeholder="[
+                      $t('l_Survey_date_from'),
+                      $t('l_Survey_date_to'),
+                    ]"
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  />
+                </div>
+                <div
+                  class="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:justify-end"
+                >
+                  <a-button class="w-full sm:w-auto" @click="resetFilters">{{
+                    $t("l_Reset")
+                  }}</a-button>
+                  <a-button
+                    class="w-full sm:w-auto"
+                    type="primary"
+                    @click="applyFilters"
+                    >{{ $t("l_Apply_filters") }}</a-button
+                  >
                 </div>
               </div>
             </template>
-            <a-button class="w-full sm:w-auto min-w-[150px]" type="primary" ghost>
-              <span class="icon active material-symbols-outlined">filter_alt <span>{{ $t('l_Filter') }}</span></span>
+            <a-button
+              class="w-full sm:w-auto min-w-[150px]"
+              type="primary"
+              ghost
+            >
+              <span class="icon active material-symbols-outlined"
+                >filter_alt <span>{{ $t("l_Filter") }}</span></span
+              >
             </a-button>
           </a-popover>
 
           <!-- Действия -->
-          <a-button @click="downloadExcel" class="w-full sm:w-auto">📄 {{ $t('l_Download_excel') }}</a-button>
+          <a-button @click="downloadExcel" class="w-full sm:w-auto"
+            >📄 {{ $t("l_Download_excel") }}</a-button
+          >
           <a-button class="w-full sm:w-auto" @click="downloadTemplate">
-            <span class="ml-2">📄 {{ $t('l_Download_template') }}</span>
+            <span class="ml-2">📄 {{ $t("l_Download_template") }}</span>
           </a-button>
           <a-button class="w-full sm:w-auto" @click="fileInput?.click()">
-            <span class="material-symbols-outlined">upload <span class="ml-2">{{ $t('l_Upload_file') }}</span></span>
+            <span class="material-symbols-outlined"
+              >upload <span class="ml-2">{{ $t("l_Upload_file") }}</span></span
+            >
           </a-button>
           <input
             type="file"
@@ -109,7 +173,9 @@
             @change="handleFileUpload"
           />
           <a-button type="primary" class="w-full sm:w-auto" @click="onAdd">
-            <span class="material-symbols-outlined">add <span class="ml-2">{{ $t('l_Add_pregnant') }}</span></span>
+            <span class="material-symbols-outlined"
+              >add <span class="ml-2">{{ $t("l_Add_pregnant") }}</span></span
+            >
           </a-button>
         </div>
       </template>
@@ -261,9 +327,24 @@ const columns = [
     customRender: ({ text }: TableRenderProps<Pregnant>) =>
       text ? dayjs(text).format("DD.MM.YYYY") : "",
   },
-  { title: $t("l_Pregnancy_weeks"), dataIndex: "pregnancy_weeks", responsive: ["md"] , width:"100px"},
-  { title: $t("l_Address"), dataIndex: "address", responsive: ["lg"], ellipsis: true },
-  { title: $t("l_Organization"), dataIndex: "organization_name", responsive: ["md"], ellipsis: true },
+  {
+    title: $t("l_Pregnancy_weeks"),
+    dataIndex: "pregnancy_weeks",
+    responsive: ["md"],
+    width: "100px",
+  },
+  {
+    title: $t("l_Address"),
+    dataIndex: "address",
+    responsive: ["lg"],
+    ellipsis: true,
+  },
+  {
+    title: $t("l_Organization"),
+    dataIndex: "organization_name",
+    responsive: ["md"],
+    ellipsis: true,
+  },
   {
     title: $t("l_Visit_date"),
     dataIndex: "visit_date",
@@ -333,7 +414,7 @@ const handleFileUpload = async (e: Event) => {
   formData.append("file", file);
   try {
     loading.value = true;
-    await PregnantApi("upload", formData, "POST", { fileUpload: true });
+    await PregnantApi("upload/", formData, "POST", { fileUpload: true });
     message.success($t("l_File_upload_success"));
     fetchPregnantWomen();
   } catch {
@@ -352,8 +433,60 @@ const fetchPregnantWomen = async () => {
       page_size: pagination.value.pageSize,
     };
     if (search.value.trim()) queryParams.search = search.value.trim();
-    if (Object.keys(currentFilters.value).length > 0)
-      Object.assign(queryParams, currentFilters.value);
+    if (Object.keys(currentFilters.value).length > 0) {
+      const {
+        pregnancy_weeks_min,
+        pregnancy_weeks_max,
+        monitoring_category,
+        has_risk,
+        has_surveys,
+        no_surveys_range,
+        survey_date_range,
+      } = currentFilters.value;
+
+      if (
+        pregnancy_weeks_min !== undefined &&
+        pregnancy_weeks_min !== null &&
+        pregnancy_weeks_min !== ""
+      ) {
+        queryParams.pregnancy_weeks_min = Number(pregnancy_weeks_min);
+      }
+      if (
+        pregnancy_weeks_max !== undefined &&
+        pregnancy_weeks_max !== null &&
+        pregnancy_weeks_max !== ""
+      ) {
+        queryParams.pregnancy_weeks_max = Number(pregnancy_weeks_max);
+      }
+      if (monitoring_category)
+        queryParams.monitoring_category = String(monitoring_category);
+      if (has_risk !== undefined && has_risk !== null && has_risk !== "") {
+        queryParams.has_risk = String(has_risk) === "true";
+      }
+      if (
+        has_surveys !== undefined &&
+        has_surveys !== null &&
+        has_surveys !== ""
+      ) {
+        queryParams.has_surveys = String(has_surveys) === "true";
+      }
+      if (
+        no_surveys_range &&
+        Array.isArray(no_surveys_range) &&
+        no_surveys_range.length === 2
+      ) {
+        queryParams.no_surveys_from = String(no_surveys_range[0]);
+        queryParams.no_surveys_to = String(no_surveys_range[1]);
+      }
+      if (
+        survey_date_range &&
+        Array.isArray(survey_date_range) &&
+        survey_date_range.length === 2
+      ) {
+        queryParams.survey_date_from = String(survey_date_range[0]);
+        queryParams.survey_date_to = String(survey_date_range[1]);
+      }
+    }
     Object.keys(queryParams).forEach((key) => {
       if (queryParams[key] === "" || queryParams[key] == null)
         delete queryParams[key];

@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: care-crm-web:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+

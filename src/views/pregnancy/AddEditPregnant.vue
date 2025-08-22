@@ -2,7 +2,7 @@
     <a-modal
       :title="id ? $t('l_Edit_pregnant') : $t('l_Add_pregnant')"
       :visible="open"
-    
+    footer
       @cancel="closeModal"
       :confirmLoading="loading"
       destroyOnClose

@@ -62,7 +62,7 @@
     <template v-if="data">
       <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
         <h3>{{ $t("l_Surveys") }}</h3>
-        <a-button type="primary" @click="onAddSurvey">
+        <a-button type="primary" @click="onAddSurvey(data.id)">
           <span class="material-symbols-outlined">
             add <span class="ml-2">{{ $t("l_Add_survey") }}</span>
           </span>
@@ -111,7 +111,7 @@
     <!-- Модалка добавления анкеты -->
     <AddEditSurvey
       v-model:open="surveyModalVisible"
-      :kidId="props.id"
+      :childId="props.id"
       :surveyId="editingSurveyId"
       @success="fetchSurveys"
     />
@@ -209,7 +209,8 @@ const surveyColumns = [
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
 
-const onAddSurvey = () => {
+const onAddSurvey = (childId: string) => {
+  editingSurveyId.value = null;
   surveyModalVisible.value = true;
 };
 
