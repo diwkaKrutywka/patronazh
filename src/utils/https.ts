@@ -2,11 +2,10 @@
 import axios from 'axios'
 import { useUserStore } from '../store/index'
 import router from '../router'
-
-
+import baseUrl from '../config'
 
 const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: baseUrl.baseURL,
   timeout: 30000,
   headers: {
     'ngrok-skip-browser-warning': '69420',

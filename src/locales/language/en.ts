@@ -147,4 +147,11 @@ export default {
   report_nurse_diary_title: "Patronage nurse diary",
   report_nurse_diary_desc: "Diary on completing the plan of universal visits.",
   report_btn_download: "Download",
+  l_Reports: "Reports",
+  l_Surveys: "Surveys",
+  l_Add_survey: "Add Survey", 
+  l_Due_date: "Due Date",
+  l_Edit_children: "Edit Information",
+  l_Edit_pregnant: "Edit Information",
+  l_File_upload_failed: "File upload failed",
 };

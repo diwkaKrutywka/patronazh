@@ -1,13 +1,12 @@
 services:
   front:
-#    image: ${IMAGE_REGISTRY_URL}:latest
-    build: .
+    image: ${IMAGE_REGISTRY_URL}:latest
     ports:
       - "8088:80"
     environment:
       - stack.env
-#    networks:
-#     - frontend-net
+    networks:
+     - frontend-net
     deploy:
      replicas: 1
      restart_policy:
@@ -16,7 +15,7 @@ services:
        constraints:
          - node.role == worker
 
-#networks:
-# frontend-net:
-#   external:
-#     true
+networks:
+ frontend-net:
+   external:
+     true

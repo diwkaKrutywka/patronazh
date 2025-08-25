@@ -10,7 +10,7 @@ export interface MenuItem {
 }
 
 export function getMenuList(): MenuItem[] {
-  const $t = i18n.global.t
+  const $t = (i18n.global as any).t
 
   return [
     // {
