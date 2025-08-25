@@ -29,7 +29,7 @@ deploy:
     - apk add --no-cache curl
   script:
     - |
-      curl -X POST "https://78.40.109.183:9443/api/stacks/webhooks/09c3eb22-cbad-49f4-a5e7-9f72eb6d3fd1" \
+      curl -X POST "https://78.40.109.183:9443/api/stacks/webhooks/ca05194e-f54f-4a44-81fa-af3702cdbaa3" \
            -H "Content-Type: application/json" \
            -k
   needs:
