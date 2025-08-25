@@ -2,9 +2,10 @@
 import axios from 'axios'
 import { useUserStore } from '../store/index'
 import router from '../router'
+import baseUrl from '../config'
 
 const http = axios.create({
-  baseURL: 'https://rapidly-magnetic-seahorse.ngrok-free.app/api/v1/',
+  baseURL: baseUrl.baseURL,
   timeout: 30000,
   headers: {
     'ngrok-skip-browser-warning': '69420',

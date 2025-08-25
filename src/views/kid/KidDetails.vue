@@ -62,7 +62,7 @@
     <template v-if="data">
       <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
         <h3>{{ $t("l_Surveys") }}</h3>
-        <a-button type="primary" @click="onAddSurvey(data.id)">
+        <a-button type="primary" @click="onAddSurvey()">
           <span class="material-symbols-outlined">
             add <span class="ml-2">{{ $t("l_Add_survey") }}</span>
           </span>
@@ -163,11 +163,6 @@ const drawerWidth = computed<string | number>(() => {
   return 800;
 });
 
-const descColumns = computed<number>(() => {
-  if (isMobile.value) return 1;
-  if (isTablet.value) return 2;
-  return 3;
-});
 
 // ======== Пагинация ========
 const pagination = ref({
@@ -209,7 +204,7 @@ const surveyColumns = [
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
 
-const onAddSurvey = (childId: string) => {
+const onAddSurvey = () => {
   editingSurveyId.value = null;
   surveyModalVisible.value = true;
 };

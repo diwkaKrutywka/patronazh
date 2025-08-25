@@ -1,7 +1,8 @@
 function getBaseUrl() {
-  return "https://rapidly-magnetic-seahorse.ngrok-free.app/api/v1/"
- // return "http://10.100.0.61:8030/";
+  // Check for runtime config first, then build-time env
+  return (window as any).APP_CONFIG?.BASE_API_URL || import.meta.env.VITE_BASE_API_URL || '';
 }
+
 
 const baseUrl = {
   baseURL: getBaseUrl(),

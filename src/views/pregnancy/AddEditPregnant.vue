@@ -46,7 +46,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, watch, onMounted } from "vue";
+  import { ref, watch } from "vue";
   import { message } from "ant-design-vue";
   import { useI18n } from "vue-i18n";
   import { PregnantApi } from "../../api/pregnancy";
@@ -67,7 +67,14 @@
   const loading = ref(false);
   const formRef = ref();
   
-  const form = ref({
+  const form = ref<{
+    full_name: string;
+    iin: string;
+    birth_date: any;
+    visit_date: any;
+    due_date_12_weeks: any;
+    address: string;
+  }>({
     full_name: "",
     iin: "",
     birth_date: null,

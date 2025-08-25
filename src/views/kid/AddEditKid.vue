@@ -140,10 +140,6 @@ const handleSubmit = () => {
   });
 };
 
-const handleCancel = () => {
-  visible.value = false;
-  emit("update:open", false);
-};
 
 const resetForm = () => {
   form.iin = "";

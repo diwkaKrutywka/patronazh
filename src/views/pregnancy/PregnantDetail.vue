@@ -154,12 +154,6 @@ const drawerWidth = computed(() => {
   if (windowWidth.value < 1024) return '70%';
   return 800;
 });
-// Responsive description columns
-const descriptionsColumns = computed(() => {
-  if (windowWidth.value < 480) return 1;
-  if (windowWidth.value < 768) return 2;
-  return 3;
-});
 const pagination = ref({
   current: 1,
   pageSize: 10,
