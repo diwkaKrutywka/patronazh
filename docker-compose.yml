@@ -3,7 +3,7 @@ services:
     image: ${IMAGE_REGISTRY_URL}:latest
     ports:
       - "8081:80"
-    environment:
+    env_file:
       - stack.env
     networks:
      - frontend-net
