@@ -11,8 +11,13 @@ RUN npm install
 # Копируем весь проект
 COPY . .
 
-# Accept build argument for API URL
+# Accept build arguments for environment variables
 ARG VITE_BASE_API_URL
+ARG IMAGE_REGISTRY_URL
+
+# Устанавливаем переменные окружения для сборки
+ENV VITE_BASE_API_URL=$VITE_BASE_API_URL
+ENV IMAGE_REGISTRY_URL=$IMAGE_REGISTRY_URL
 
 # Сборка проекта
 RUN CI=false npm run build

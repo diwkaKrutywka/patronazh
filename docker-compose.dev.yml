@@ -1,6 +1,10 @@
 services:
   front:
-    build: .
+    build: 
+      context: .
+      args:
+        - VITE_BASE_API_URL=${VITE_BASE_API_URL}
+        - IMAGE_REGISTRY_URL=${IMAGE_REGISTRY_URL}
     ports:
       - "8088:80"
     env_file:

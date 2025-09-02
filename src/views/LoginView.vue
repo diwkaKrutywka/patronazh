@@ -60,7 +60,7 @@
     </div>
   </div>
   
-  <footer class="footer-contact">
+  <!-- <footer class="footer-contact">
     <div class="footer-content">
       <span>Contact: </span>
       <a href="mailto:support@example.com" class="footer-link">support@example.com</a>
@@ -69,7 +69,7 @@
       <span class="footer-separator">|</span>
       <span>123 Main St, City, Country</span>
     </div>
-  </footer>
+  </footer> -->
 </template>
 
 <script>

@@ -3,6 +3,9 @@ services:
     image: ${IMAGE_REGISTRY_URL}:latest
     ports:
       - "8081:80"
+    environment:
+      - VITE_BASE_API_URL=${VITE_BASE_API_URL}
+      - IMAGE_REGISTRY_URL=${IMAGE_REGISTRY_URL}
     env_file:
       - stack.env
     networks:
