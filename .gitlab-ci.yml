@@ -33,7 +33,8 @@ deploy-dev:
   stage: deploy
   tags:
     - shell
-  image: curlimages/curl:latest
+  before_script:
+    - which curl || apt-get update && apt-get install -y curl
   script: curl -k -X POST "https://78.40.109.183:9443/api/stacks/webhooks/ca05194e-f54f-4a44-81fa-af3702cdbaa3"
   needs:
     - build
