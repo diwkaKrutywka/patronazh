@@ -28,8 +28,6 @@ build:
     - main
     - dev
 
-
-
 deploy-dev:
   stage: deploy
   tags:
