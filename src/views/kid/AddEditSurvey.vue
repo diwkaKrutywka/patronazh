@@ -4,7 +4,7 @@
     :title="$t('l_Create_child_survey')"
     :confirm-loading="loading"
     :footer="null"
-      @cancel="closeModal"
+    @cancel="handleCancel"
     :okText="$t('l_Create')"
     destroyOnClose
     width="900px"
@@ -213,9 +213,9 @@ import { message } from "ant-design-vue";
 import { SurveysApi } from "../../api/survey";
 
 const props = defineProps({
-  open: Boolean,
-  childId: String,
-  surveyId: String,
+  open: { type: Boolean },
+  childId: { type: String, required: false },
+  surveyId: { type: String, required: false }
 });
 const emit = defineEmits(["update:open", "success"]);
 

@@ -252,7 +252,7 @@ import type { TableRenderProps } from "../../types/table";
 const { t: $t } = useI18n();
 
 const detailVisible = ref(false);
-const selectedId = ref<string | null>(null);
+const selectedId = ref<string>();
 const onOpenDetails = (id: string) => {
   selectedId.value = id;
   detailVisible.value = true;

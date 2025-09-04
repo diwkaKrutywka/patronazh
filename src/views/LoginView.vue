@@ -77,7 +77,7 @@ import { Button, Input, message } from "ant-design-vue"
 import ChangeLanguageBox from "../components/change-language-box.vue"
 import config from "../config"
 import { ApiApi } from "../api/auth"
-import { useUserStore } from '../store/index.js'
+import { useUserStore } from '../store/index'
 const BaseUrl = config.baseURL
 export default {
   components: {

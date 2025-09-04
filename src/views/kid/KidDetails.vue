@@ -130,12 +130,10 @@ import { useGlobal } from "../../composables/useGlobal"; // путь попра�
 const { t: $t } = useI18n();
 const { $formatIsoDate } = useGlobal();
 
-const props = defineProps<{
-  visible: boolean;
-  id: string | null;
-}>();
-
-const emit = defineEmits(["close"]);
+const props = defineProps({
+  visible: { type: Boolean, required: true },
+  id: { type: String, default: null }
+});const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
 
@@ -179,7 +177,7 @@ const pagination = ref({
 const surveys = ref([]);
 const loadingSurveys = ref(false);
 const surveyModalVisible = ref(false);
-const editingSurveyId = ref<string | null>(null);
+const editingSurveyId = ref<string>();
 
 const surveyColumns = [
   {
@@ -205,7 +203,7 @@ const surveyColumns = [
 ];
 
 const onAddSurvey = () => {
-  editingSurveyId.value = null;
+  editingSurveyId.value = undefined;
   surveyModalVisible.value = true;
 };
 
