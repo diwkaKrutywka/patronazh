@@ -29,12 +29,20 @@ build:
     - dev
 
 
+
 deploy-dev:
   stage: deploy
   tags:
     - shell
-  script: curl -k -X POST "http://78.40.109.183:9000/api/stacks/webhooks/217f45e5-20a9-47f4-a93e-41360861dcdf"
-  needs:
-    - build
+  image: curlimages/curl:latest
+  before_script:
+    - |
+      if [ -z "$PORTAINER_WEBHOOK" ] || [ -z "$PORTAINER_TOKEN" ]; then
+        echo "Missing required webhook variables"
+        exit 1
+      fi
+  script:
+    - curl --fail --max-time 30 -X POST "${PORTAINER_WEBHOOK}/${PORTAINER_TOKEN}"
   only:
     - dev
+
