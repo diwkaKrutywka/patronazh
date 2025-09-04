@@ -425,7 +425,7 @@ const onDelete = async (id: string) => {
 
 const downloadTemplate = async () => {
   try {
-    const response = await KidsApi("template", {}, "GET", {
+    const response = await KidsApi("template/", {}, "GET", {
       fileDownload: true,
     });
     const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });

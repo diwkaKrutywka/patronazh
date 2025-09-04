@@ -29,7 +29,13 @@
       :model="form"
       layout="vertical"
     >
-     
+      <a-form-item :label="$t('l_Fill_date')">
+        <a-date-picker
+          v-model:value="form.fill_date"
+          value-format="YYYY-MM-DD"
+          style="width: 100%"
+        />
+      </a-form-item>
 
       <a-form-item :label="$t('l_Risk_identified_date')">
         <a-date-picker
@@ -91,6 +97,7 @@ const loading = ref(false)
 
 const form = ref({
   pregnant_woman: '',
+  fill_date: dayjs().format('YYYY-MM-DD'),
   risk_identified_date: dayjs().format('YYYY-MM-DD'),
   nutrition: 0,
   depression: 0,
