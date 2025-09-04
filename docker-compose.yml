@@ -1,6 +1,6 @@
 services:
   front:
-    image: ${IMAGE_REGISTRY_URL}:latest
+    image: ${IMAGE_REGISTRY_URL}:dev
     ports:
       - "8081:80"
     environment:
