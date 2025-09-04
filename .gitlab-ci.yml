@@ -45,4 +45,3 @@ deploy-dev:
     - curl --fail --max-time 30 -X POST "${PORTAINER_WEBHOOK}/${PORTAINER_TOKEN}"
   only:
     - dev
-
