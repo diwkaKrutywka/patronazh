@@ -167,7 +167,7 @@ const labelKeyByUserField: Record<string, string> = {
   branch: 'user_label_branch',
   
 };
-
+ 
 const getLabel = (key: string): string => {
   const tKey = labelKeyByUserField[key];
   const { t } = useI18n();
