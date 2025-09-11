@@ -144,13 +144,16 @@ import dayjs from "dayjs";
 import { FileExcelOutlined } from "@ant-design/icons-vue";
 
 const dateMode = ref<"month-year" | "range">("range");
-const dateRange = ref<[string, string] | null>(null);
+const dateRange = ref<[dayjs.Dayjs, dayjs.Dayjs] | null>([
+  dayjs().subtract(30, 'day'),
+  dayjs()
+]);
 const month = ref<number | null>(null);
 const year = ref<number | null>(dayjs().year());
 const downloading = ref<string | null>(null);
 
 const disabledFutureDate = (current: any) =>
-  current && current > dayjs().endOf("day");
+  current && dayjs(current).isValid() && dayjs(current).isAfter(dayjs().endOf("day"));
 
 async function downloadReport(type: string) {
   try {
@@ -161,6 +164,7 @@ async function downloadReport(type: string) {
     if (dateMode.value === "month-year") {
       if (!month.value || !year.value) {
         message.warning("Выберите месяц и год");
+        downloading.value = null;
         return;
       }
       params.month = month.value;
@@ -169,6 +173,7 @@ async function downloadReport(type: string) {
     } else if (dateMode.value === "range") {
       if (!dateRange.value) {
         message.warning("Выберите диапазон дат");
+        downloading.value = null;
         return;
       }
       const start = dayjs(dateRange.value[0]).format("YYYY-MM-DD");
@@ -194,8 +199,9 @@ async function downloadReport(type: string) {
     link.remove();
     window.URL.revokeObjectURL(url);
     message.success("Отчёт успешно скачан");
-  } catch (e) {
-    message.error("Ошибка при скачивании отчёта");
+  } catch (e: any) {
+    console.error("Download error:", e);
+    message.error(e?.response?.data?.message || "Ошибка при скачивании отчёта");
   } finally {
     downloading.value = null;
   }
