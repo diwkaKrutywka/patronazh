@@ -34,6 +34,10 @@
       <a-form-item :label="$t('l_Address')" name="address">
         <a-input v-model:value="form.address" />
       </a-form-item>
+
+      <a-form-item :label="$t('l_Phone_number')" name="phone_number">
+        <a-input v-model:value="form.phone_number" />
+      </a-form-item>
       <div class="flex justify-end gap-2 mt-4">
         <a-button type="primary" @click="handleSubmit">{{
           $t("l_Create")
@@ -55,6 +59,7 @@ interface KidForm {
   birth_date: string;
   gender: string;
   address: string;
+  phone_number: string;
 }
 
 const props = defineProps<{
@@ -80,6 +85,7 @@ const form = reactive<KidForm>({
   birth_date: "",
   gender: "MALE",
   address: "",
+  phone_number: "+7",
 });
 
 const rules = {
@@ -88,6 +94,7 @@ const rules = {
   birth_date: [{ required: true, message: $t("l_Required_field") }],
   gender: [{ required: true, message: $t("l_Required_field") }],
   address: [{ required: true, message: $t("l_Required_field") }],
+  phone_number: [{ required: true, message: $t("l_Required_field") }],
 };
 
 // Следим за открытием
@@ -147,5 +154,6 @@ const resetForm = () => {
   form.birth_date = "";
   form.gender = "MALE";
   form.address = "";
+  form.phone_number = "+7";
 };
 </script>

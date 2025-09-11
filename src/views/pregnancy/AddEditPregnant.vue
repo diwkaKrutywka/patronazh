@@ -36,6 +36,10 @@
         <a-form-item :label="$t('l_Address')" name="address">
           <a-input v-model:value="form.address" />
         </a-form-item>
+
+        <a-form-item :label="$t('l_Phone_number')" name="phone_number">
+          <a-input v-model:value="form.phone_number" />
+        </a-form-item>
         <div class="flex justify-end gap-2 mt-4">
         <a-button type="primary" @click="handleSubmit">{{
           $t("l_Create")
@@ -74,6 +78,7 @@
     visit_date: any;
     due_date_12_weeks: any;
     address: string;
+    phone_number: string;
   }>({
     full_name: "",
     iin: "",
@@ -81,6 +86,7 @@
     visit_date: null,
     due_date_12_weeks: null,
     address: "",
+    phone_number: "+7",
   });
   
   const rules = {
@@ -93,6 +99,7 @@
     visit_date: [{ required: true, message: $t("l_Required_field") }],
     due_date_12_weeks: [{ required: true, message: $t("l_Required_field") }],
     address: [{ required: true, message: $t("l_Required_field") }],
+    phone_number: [{ required: true, message: $t("l_Required_field") }],
   };
   
   const closeModal = () => {
@@ -111,6 +118,7 @@
         visit_date: data.visit_date ? dayjs(data.visit_date) : null,
         due_date_12_weeks: data.due_date_12_weeks ? dayjs(data.due_date_12_weeks) : null,
         address: data.address,
+        phone_number: data.phone_number || "+7",
       };
     } finally {
       loading.value = false;
@@ -157,6 +165,7 @@
             visit_date: null,
             due_date_12_weeks: null,
             address: "",
+            phone_number: "+7",
           };
         }
       }

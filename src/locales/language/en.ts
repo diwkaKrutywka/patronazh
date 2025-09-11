@@ -36,6 +36,7 @@ export default {
   l_Birth_date: "Birth Date",
   l_Gender: "Gender",
   l_Address: "Address",
+  l_Phone_number: "Phone number",
   l_Age_months: "Age (months)",
   l_Created_at: "Created At",
   l_Updated_at: "Updated At",

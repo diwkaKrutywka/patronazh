@@ -36,6 +36,7 @@ export default {
   l_Birth_date: "Туған күні",
   l_Gender: "Жынысы",
   l_Address: "Мекенжай",
+  l_Phone_number: "Телефон нөмірі",
   l_Age_months: "Жасы (аймен)",
   l_Created_at: "Құрылу күні",
   l_Updated_at: "Жаңарту күні",

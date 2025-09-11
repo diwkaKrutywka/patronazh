@@ -38,6 +38,7 @@ export default {
   l_Birth_date: "Дата рождения",
   l_Gender: "Пол",
   l_Address: "Адрес",
+  l_Phone_number: "Номер телефона",
   l_Age_months: "Возраст (месяцы)",
   l_Created_at: "Дата создания",
   l_Updated_at: "Дата обновления",

@@ -256,7 +256,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, h } from "vue";
-import { Avatar, message } from "ant-design-vue";
+import { Avatar, message, Tag } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import AddEditPregnant from "./AddEditPregnant.vue";
@@ -282,6 +282,7 @@ type Pregnant = {
   due_date_12_weeks: string;
   due_date_32_weeks: string;
   address: string;
+  phone_number: string;
   organization_id: string;
   organization_name: string;
   monitoring_category: string;
@@ -349,6 +350,14 @@ const columns = [
     dataIndex: "organization_name",
     responsive: ["md"],
     ellipsis: true,
+  },
+  {
+    title: $t("l_Phone_number"),
+    dataIndex: "phone_number",
+    responsive: ["sm"],
+    customRender: ({ text }: TableRenderProps<Pregnant>) => {
+      return h(Tag, { color: "blue" }, () => text || "-");
+    },
   },
   {
     title: $t("l_Visit_date"),

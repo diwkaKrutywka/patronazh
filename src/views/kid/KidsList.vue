@@ -262,6 +262,7 @@ type Kid = {
   gender: string;
   address: string;
   organization: string;
+  phone_number: string;
   age_months: number;
   created_at: string;
   updated_at: string;
@@ -394,6 +395,14 @@ const columns = [
     dataIndex: "organization_name",
     responsive: ["md"],
     ellipsis: true,
+  },
+  {
+    title: $t("l_Phone_number"),
+    dataIndex: "phone_number",
+    responsive: ["sm"],
+    customRender: ({ text }: TableRenderProps<Kid>) => {
+      return h(Tag, { color: "blue" }, () => text || "-");
+    },
   },
   {
     title: $t("l_Age_months"),

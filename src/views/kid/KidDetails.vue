@@ -35,6 +35,9 @@
       <a-descriptions-item :label="$t('l_Address')">
         {{ data.address }}
       </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Phone_number')">
+        {{ data.phone_number }}
+      </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Organization')">
         {{ data.organization_name }}
       </a-descriptions-item>
