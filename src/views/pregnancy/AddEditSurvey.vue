@@ -2,7 +2,7 @@
   <a-modal
     v-model:open="modalVisible"
     :title="$t('l_Create_survey')"
-      @cancel="closeModal"
+      @cancel="handleCancel"
     :confirm-loading="loading"
     :footer="null"
     destroyOnClose
@@ -82,10 +82,10 @@ import { message } from 'ant-design-vue'
 import { SurveysApi } from '../../api/survey'
 
 const props = defineProps({
-  open: Boolean,
-  pregnantWomanId: String,
-  surveyId: String // <-- id анкеты для редактирования
-})
+  open: { type: Boolean },
+  pregnantWomanId: { type: String, required: false },
+  surveyId: { type: String, required: false }
+});;
 const emit = defineEmits(['update:open', 'success'])
 
 const modalVisible = computed({
@@ -119,7 +119,7 @@ watch(
           const { data } = await SurveysApi(`pregnant-women/${props.surveyId}/`, {}, 'GET')
           form.value = {
             pregnant_woman: data.pregnant_woman,
-         
+            fill_date: data.fill_date || dayjs().format('YYYY-MM-DD'),
             risk_identified_date: data.risk_identified_date,
             nutrition: data.nutrition,
             depression: data.depression,

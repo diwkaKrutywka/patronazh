@@ -133,12 +133,10 @@ import { useGlobal } from "../../composables/useGlobal"; // путь попра�
 const { t: $t } = useI18n();
 const { $formatIsoDate } = useGlobal();
 
-const props = defineProps<{
-  visible: boolean;
-  id: string | null;
-}>();
-
-const emit = defineEmits(["close"]);
+const props = defineProps({
+  visible: { type: Boolean, required: true },
+  id: { type: String, default: null }
+});const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
 // Responsive drawer width
@@ -206,7 +204,7 @@ const surveyColumns = [
 
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
-const editingSurveyId = ref<string | null>(null);
+const editingSurveyId = ref<string>();
 
 const onEdit = (record: any) => {
   editingSurveyId.value = record.id;

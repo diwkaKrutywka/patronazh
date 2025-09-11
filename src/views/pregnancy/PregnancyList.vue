@@ -195,9 +195,23 @@
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'full_name'">
-            <span class="clickable-text" @click.stop="onOpenDetails(record.id)">
-              {{ record.full_name }}
-            </span>
+            <div class="flex items-center gap-2">
+              <a-avatar
+                :style="{
+                  backgroundColor: '#E5EDFF',
+                  color: '#2B4EFF',
+                  fontWeight: '600',
+                }"
+              >
+                {{ record.full_name?.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() }}
+              </a-avatar>
+              <span 
+                class="cursor-pointer hover:text-blue-600 underline transition" 
+                @click.stop="onOpenDetails(record.id)"
+              >
+                {{ record.full_name }}
+              </span>
+            </div>
           </template>
 
           <template v-else-if="column.key === 'Action'">
@@ -242,7 +256,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, h } from "vue";
-import { message } from "ant-design-vue";
+import { Avatar, message } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import AddEditPregnant from "./AddEditPregnant.vue";
@@ -252,7 +266,7 @@ import type { TableRenderProps } from "../../types/table";
 const { t: $t } = useI18n();
 
 const detailVisible = ref(false);
-const selectedId = ref<string | null>(null);
+const selectedId = ref<string>();
 const onOpenDetails = (id: string) => {
   selectedId.value = id;
   detailVisible.value = true;
@@ -309,15 +323,6 @@ const columns = [
   {
     title: $t("l_Full_name"),
     dataIndex: "full_name",
-    customRender: ({ text, record }: TableRenderProps<Pregnant>) =>
-      h(
-        "span",
-        {
-          class: "cursor-pointer hover:text-blue-600 underline transition",
-          onClick: () => onOpenDetails(record.id),
-        },
-        text
-      ),
   },
   { title: $t("l_IIN"), dataIndex: "iin", responsive: ["sm"] },
   {

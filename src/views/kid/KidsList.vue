@@ -276,7 +276,7 @@ const modalVisible = ref(false);
 const editingKid = ref<Kid | null>(null);
 
 const detailsVisible = ref(false);
-const selectedKid = ref<string | null>(null);
+const selectedKid = ref<string>();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const filtersOpen = ref(false);
