@@ -7,7 +7,8 @@
     @cancel="handleCancel"
     :okText="$t('l_Create')"
     destroyOnClose
-    width="900px"
+    width="700px"
+    :bodyStyle="{ maxHeight: '70vh', overflowY: 'auto' }"
   >
     <!-- Инфо блок -->
     <div class="mb-4 p-3 border rounded bg-gray-50">
@@ -27,7 +28,7 @@
     </div>
 
     <!-- Форма -->
-    <a-form :model="form" layout="vertical">
+    <a-form :model="form" layout="vertical" class="survey-form">
       <a-form-item :label="$t('l_Fill_date')">
         <a-date-picker
           v-model:value="form.fill_date"
@@ -185,19 +186,9 @@
 
       <!-- Автовычисления -->
       <a-divider />
-      <a-descriptions bordered column="3" size="small">
-        <a-descriptions-item :label="$t('l_Total_score')">
-          {{ totalScore }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('l_Max_score')">
-          {{ maxScore }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('l_Risk_level')">
-          <span :class="riskLevelClass">{{ riskLevel }}</span>
-        </a-descriptions-item>
-      </a-descriptions>
+   
 
-      <div class="flex justify-end gap-2 mt-4">
+      <div class="flex justify-end gap-2">
         <a-button type="primary" @click="handleSubmit">{{
           $t("l_Create")
         }}</a-button>
@@ -211,6 +202,9 @@ import { ref, watch, computed } from "vue";
 import dayjs from "dayjs";
 import { message } from "ant-design-vue";
 import { SurveysApi } from "../../api/survey";
+import { useI18n } from "vue-i18n";
+
+const { t: $t } = useI18n();
 
 const props = defineProps({
   open: { type: Boolean },
@@ -251,9 +245,11 @@ watch(
   () => props.open,
   async (val) => {
     if (val) {
-      form.value.child = props.childId;
-
+      // Всегда сбрасываем форму при открытии
+      resetForm();
+      
       if (props.surveyId) {
+        // Если есть surveyId — загружаем данные для редактирования
         loading.value = true;
         try {
           const { data } = await SurveysApi(
@@ -263,10 +259,39 @@ watch(
           );
           form.value = { ...data };
         } catch {
-          message.error("Failed to load survey details");
+          message.error($t("l_Failed_to_load_survey_details"));
         } finally {
           loading.value = false;
         }
+      }
+    } else {
+      // Сбрасываем форму при закрытии модалки
+      resetForm();
+    }
+  }
+);
+
+// Дополнительно отслеживаем изменения surveyId
+watch(
+  () => props.surveyId,
+  (newSurveyId) => {
+    if (props.open) {
+      if (newSurveyId) {
+        // Если surveyId изменился на существующий - загружаем данные
+        loading.value = true;
+        SurveysApi(`children/${newSurveyId}/`, {}, "GET")
+          .then(({ data }) => {
+            form.value = { ...data };
+          })
+          .catch(() => {
+            message.error($t("l_Failed_to_load_survey_details"));
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+      } else {
+        // Если surveyId стал undefined - сбрасываем форму
+        resetForm();
       }
     }
   }
@@ -280,16 +305,19 @@ const totalScore = computed(() => {
 });
 
 const maxScore = computed(() => {
-  return Math.max(
-    ...Object.entries(form.value)
-      .filter(([k]) => !["child", "fill_date"].includes(k))
-      .map(([_, v]) => Number(v) || 0)
-  );
+  const values = Object.entries(form.value)
+    .filter(([k]) => !["child", "fill_date"].includes(k))
+    .map(([_, v]) => Number(v) || 0);
+  
+  return Math.max(...values);
 });
 
 const riskLevel = computed(() => {
+  // Если в любом поле есть значение 2, то уровень риска HIGH
   if (maxScore.value === 2) return "HIGH";
+  // Если в любом поле есть значение 1, то уровень риска MODERATE
   if (maxScore.value === 1) return "MODERATE";
+  // Если все поля 0, то уровень риска LOW
   return "LOW";
 });
 
@@ -314,15 +342,17 @@ const handleSubmit = () => {
     .then(() => {
       message.success(
         props.surveyId
-          ? "Survey updated successfully"
-          : "Survey created successfully"
+          ? $t("l_Survey_updated_successfully")
+          : $t("l_Survey_created_successfully")
       );
       emit("success");
       modalVisible.value = false;
+      // Сбрасываем форму после успешного сохранения
+      resetForm();
     })
     .catch(() => {
       message.error(
-        props.surveyId ? "Error updating survey" : "Error creating survey"
+        props.surveyId ? $t("l_Error_updating_survey") : $t("l_Error_creating_survey")
       );
     })
     .finally(() => {
@@ -330,7 +360,38 @@ const handleSubmit = () => {
     });
 };
 
+const resetForm = () => {
+  form.value = {
+    child: props.childId,
+    fill_date: dayjs().format('YYYY-MM-DD'),
+    breastfeeding: 0,
+    complementary_feeding: 0,
+    attachment: 0,
+    father_involvement: 0,
+    stimulating_environment: 0,
+    parental_depression: 0,
+    safe_environment: 0,
+    neglect_abuse: 0,
+    medical_risks: 0,
+    speech_development: 0,
+    motor_development: 0,
+    socio_emotional_development: 0,
+    low_weight: 0,
+    low_height: 0,
+    overweight: 0,
+    social_risks: 0,
+  };
+};
+
 const handleCancel = () => {
   modalVisible.value = false;
+  // Сбрасываем форму при закрытии
+  resetForm();
 };
 </script>
+
+<style scoped>
+.survey-form .ant-form-item {
+  margin-bottom: 8px;
+}
+</style>

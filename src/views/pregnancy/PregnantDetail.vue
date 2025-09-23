@@ -44,9 +44,9 @@
       <a-descriptions-item :label="$t('l_Organization')">{{
         data.organization_name
       }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Monitoring_category')">{{
+      <!-- <a-descriptions-item :label="$t('l_Monitoring_category')">{{
         data.monitoring_category
-      }}</a-descriptions-item>
+      }}</a-descriptions-item> -->
       <a-descriptions-item :label="$t('l_Created_at')">
         {{ $formatIsoDate(data.created_at) }}
       </a-descriptions-item>
@@ -235,6 +235,7 @@ const fetchSurveys = async () => {
 };
 
 const onAddSurvey = () => {
+  editingSurveyId.value = undefined;
   surveyModalVisible.value = true;
 };
 

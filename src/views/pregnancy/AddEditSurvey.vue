@@ -6,6 +6,7 @@
     :confirm-loading="loading"
     :footer="null"
     destroyOnClose
+    :bodyStyle="{ maxHeight: '70vh', overflowY: 'auto' }"
   >
     <!-- Информационный блок -->
     <div class="mb-4 p-3 border rounded bg-gray-50">
@@ -28,6 +29,7 @@
     <a-form
       :model="form"
       layout="vertical"
+      class="survey-form"
     >
       <a-form-item :label="$t('l_Fill_date')">
         <a-date-picker
@@ -65,7 +67,7 @@
         <a-input-number v-model:value="form.social_risks" :min="0" :max="2" style="width: 100%" />
       </a-form-item>
 
-      <div class="flex justify-end gap-2 mt-4">
+      <div class="flex justify-end gap-2">
         <a-button type="primary" @click="handleSubmit">{{
           $t("l_Create")
         }}</a-button>
@@ -80,6 +82,9 @@ import { ref, watch, computed } from 'vue'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { SurveysApi } from '../../api/survey'
+import { useI18n } from 'vue-i18n'
+
+const { t: $t } = useI18n()
 
 const props = defineProps({
   open: { type: Boolean },
@@ -110,10 +115,11 @@ watch(
   () => props.open,
   async (val) => {
     if (val) {
-      form.value.pregnant_woman = props.pregnantWomanId
-
-      // Если есть surveyId — грузим существующие данные
+      // Всегда сбрасываем форму при открытии
+      resetForm()
+      
       if (props.surveyId) {
+        // Если есть surveyId — загружаем данные для редактирования
         loading.value = true
         try {
           const { data } = await SurveysApi(`pregnant-women/${props.surveyId}/`, {}, 'GET')
@@ -128,10 +134,48 @@ watch(
             social_risks: data.social_risks
           }
         } catch {
-          message.error('Failed to load survey details')
+          message.error($t('l_Failed_to_load_survey_details'))
         } finally {
           loading.value = false
         }
+      }
+    } else {
+      // Сбрасываем форму при закрытии модалки
+      resetForm()
+    }
+  }
+)
+
+// Дополнительно отслеживаем изменения surveyId
+watch(
+  () => props.surveyId,
+  (newSurveyId) => {
+    if (props.open) {
+      if (newSurveyId) {
+        // Если surveyId изменился на существующий - загружаем данные
+        loading.value = true
+        SurveysApi(`pregnant-women/${newSurveyId}/`, {}, 'GET')
+          .then(({ data }) => {
+            form.value = {
+              pregnant_woman: data.pregnant_woman,
+              fill_date: data.fill_date || dayjs().format('YYYY-MM-DD'),
+              risk_identified_date: data.risk_identified_date,
+              nutrition: data.nutrition,
+              depression: data.depression,
+              medical_risks: data.medical_risks,
+              bad_habits: data.bad_habits,
+              social_risks: data.social_risks
+            }
+          })
+          .catch(() => {
+            message.error($t('l_Failed_to_load_survey_details'))
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      } else {
+        // Если surveyId стал undefined - сбрасываем форму
+        resetForm()
       }
     }
   }
@@ -147,19 +191,42 @@ const handleSubmit = () => {
 
   SurveysApi(url, form.value, method)
     .then(() => {
-      message.success(props.surveyId ? 'Survey updated successfully' : 'Survey created successfully')
+      message.success(props.surveyId ? $t('l_Survey_updated_successfully') : $t('l_Survey_created_successfully'))
       emit('success')
       modalVisible.value = false
+      // Сбрасываем форму после успешного сохранения
+      resetForm()
     })
     .catch(() => {
-      message.error(props.surveyId ? 'Error updating survey' : 'Error creating survey')
+      message.error(props.surveyId ? $t('l_Error_updating_survey') : $t('l_Error_creating_survey'))
     })
     .finally(() => {
       loading.value = false
     })
 }
 
+const resetForm = () => {
+  form.value = {
+    pregnant_woman: props.pregnantWomanId,
+    fill_date: dayjs().format('YYYY-MM-DD'),
+    risk_identified_date: dayjs().format('YYYY-MM-DD'),
+    nutrition: 0,
+    depression: 0,
+    medical_risks: 0,
+    bad_habits: 0,
+    social_risks: 0
+  }
+}
+
 const handleCancel = () => {
+  // Сбрасываем форму при закрытии
+  resetForm()
   modalVisible.value = false
 }
 </script>
+
+<style scoped>
+.survey-form .ant-form-item {
+  margin-bottom: 8px;
+}
+</style>

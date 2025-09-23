@@ -5,6 +5,7 @@
     :confirm-loading="loading"
     :footer="null"
     destroyOnClose
+    @cancel="handleCancel"
   >
     <a-form layout="vertical" :model="form" :rules="rules" ref="formRef">
       <a-form-item :label="$t('l_IIN')" name="iin">
@@ -109,6 +110,9 @@ watch(
       } else {
         resetForm();
       }
+    } else {
+      // Сбрасываем форму при закрытии
+      resetForm();
     }
   }
 );
@@ -155,5 +159,10 @@ const resetForm = () => {
   form.gender = "MALE";
   form.address = "";
   form.phone_number = "+7";
+};
+
+const handleCancel = () => {
+  visible.value = false;
+  emit("update:open", false);
 };
 </script>

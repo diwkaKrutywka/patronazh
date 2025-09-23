@@ -211,7 +211,7 @@ upload
 
             <a-popconfirm
               placement="leftBottom"
-              title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+              :title="$t('l_Delete_confirmation')"
               :ok-text="$t('l_Yes')"
               :cancel-text="$t('l_No')"
               @confirm="onDelete(record.id)"
@@ -534,7 +534,7 @@ const fetchKids = async () => {
     tableData.value = data.items;
     pagination.value.total = data.total;
   } catch (error) {
-    message.error("Не удалось загрузить список детей");
+    message.error($t("l_Failed_to_load_kids_list"));
     console.error(error);
   } finally {
     loading.value = false;
