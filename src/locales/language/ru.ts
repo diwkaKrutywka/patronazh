@@ -116,7 +116,7 @@ export default {
   l_Safe_environment: "Безопасная среда",
   l_Neglect_abuse: "Пренебрежение / Насилие",
   l_Speech_development: "Развитие речи",
-  l_Motor_development: "Моторное развитие",
+  l_Motor_development: "Вовлеченность отца",
   l_Socio_emotional_development: "Социально-эмоциональное развитие",
   l_Low_weight: "Недостаточный вес",
   l_Low_height: "Низкий рост",
@@ -179,4 +179,6 @@ export default {
   child_survey_info_risk_system: "Система оценки риска:",
   survey_info_explanation: "Общий балл = 0: НЕТ РИСКА; Общий балл > 0: ЕСТЬ РИСК (Прогрессивный пакет)",
   l_Loading: "Загрузка",
+  l_Delete_survey_confirmation: "Вы действительно хотите удалить эту анкету?",
+  l_Delete_user_confirmation: "Вы действительно хотите удалить этого пользователя?",
 };

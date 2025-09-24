@@ -223,7 +223,7 @@
               />
               <a-popconfirm
                 placement="leftBottom"
-                title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+                :title="$t('l_Delete_user_confirmation')"
                 :ok-text="$t('l_Yes')"
                 :cancel-text="$t('l_No')"
                 @confirm="onDelete(record.id)"

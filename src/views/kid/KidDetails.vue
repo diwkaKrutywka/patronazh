@@ -93,7 +93,7 @@
                 />
                 <a-popconfirm
                   placement="leftBottom"
-                  title="Сіз расымен анкетаны өшіргіңіз келеді ме?"
+                  :title="$t('l_Delete_survey_confirmation')"
                   :ok-text="$t('l_Yes')"
                   :cancel-text="$t('l_No')"
                   @confirm="onDelete(record.id)"

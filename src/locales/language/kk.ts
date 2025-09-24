@@ -176,4 +176,6 @@ export default {
   child_survey_info_risk_system: "Қауіп-қатерді бағалау жүйесі:",
   survey_info_explanation: "Жалпы балл = 0: ҚАУІП ЖОҚ; Жалпы балл > 0: ҚАУІП БАР (Прогрессивті пакет)",
   l_Loading: "Жүктелуде",
+  l_Delete_survey_confirmation: "Сіз расымен анкетаны өшіргіңіз келеді ме?",
+  l_Delete_user_confirmation: "Сіз расымен қолданушыны өшіргіңіз келеді ме?",
 };

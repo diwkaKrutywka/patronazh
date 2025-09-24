@@ -176,4 +176,6 @@ export default {
   child_survey_info_risk_system: "Risk scoring system:",
   survey_info_explanation: "Total score = 0: NO RISK; Total score > 0: HAS RISK (Progressive package)",
   l_Loading: "Loading",
+  l_Delete_survey_confirmation: "Are you sure you want to delete this survey?",
+  l_Delete_user_confirmation: "Are you sure you want to delete this user?",
 };
