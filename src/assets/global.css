@@ -24,6 +24,15 @@ html * {
   align-items: center;
   justify-content: center;
 }
+.ant-table-row:hover {
+  background-color: #efeff0 !important;
+}
+.ant-table-cell{
+  border: 1px solid white !important;
+}
+.ant-table-cell-row-hover {
+  background-color: #e7ecf0 !important;
+}
 
 .search-input :deep(.ant-input-search-button .anticon) {
   display: flex;

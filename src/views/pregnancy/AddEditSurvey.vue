@@ -9,22 +9,43 @@
     :bodyStyle="{ maxHeight: '70vh', overflowY: 'auto' }"
   >
     <!-- Информационный блок -->
-    <div class="mb-4 p-3 border rounded bg-gray-50">
-      <p>{{ $t('survey_info_intro') }}</p>
-      <p class="font-semibold mt-2">{{ $t('survey_info_risk_system') }}</p>
-      <ul class="list-disc ml-5">
+    <div class="mb-4 p-3 border rounded bg-gray-50 text-sm">
+      <p class="text-xs">{{ $t('survey_info_intro') }}</p>
+      <p class="font-semibold mt-2 text-xs">{{ $t('survey_info_risk_system') }}</p>
+      <ul class="list-disc ml-5 text-xs">
         <li>{{ $t('survey_info_score_range') }}</li>
         <li><strong>0</strong> — {{ $t('survey_info_score_0') }}</li>
         <li><strong>1</strong> — {{ $t('survey_info_score_1') }}</li>
         <li><strong>2</strong> — {{ $t('survey_info_score_2') }}</li>
       </ul>
-      <p class="font-semibold mt-2">{{ $t('survey_info_overall') }}</p>
-      <ul class="list-disc ml-5">
+      <p class="font-semibold mt-2 text-xs">{{ $t('survey_info_overall') }}</p>
+      <ul class="list-disc ml-5 text-xs">
         <li><strong>{{ $t('survey_info_no_risk_label') }}</strong>: {{ $t('survey_info_no_risk') }}</li>
         <li><strong>{{ $t('survey_info_has_risk_label') }}</strong>: {{ $t('survey_info_has_risk') }}</li>
       </ul>
     </div>
-
+    <!-- Ключевые даты -->
+    <div v-if="keyDates.length > 0" class="mt-4">
+      <h4 class="text-sm font-semibold mb-2">{{ $t('l_Key_dates') }}</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div 
+          v-for="(keyDate, index) in keyDates" 
+          :key="index"
+          class="bg-red-100 border border-red-300 rounded p-3 text-sm"
+        >
+          <div class="font-medium text-red-800">{{ keyDate.period_name }}</div>
+          <div class="text-red-700">
+            <div>{{ $t('l_Date') }}: {{ keyDate.date }}</div>
+            <div v-if="keyDate.range_start && keyDate.range_end">
+              {{ $t('l_Period') }}: {{ keyDate.range_start }} - {{ keyDate.range_end }}
+            </div>
+            <div v-if="keyDate.days_until !== undefined">
+              {{ $t('l_Days_until') }}: {{ keyDate.days_until }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Форма -->
     <a-form
       :model="form"
@@ -39,12 +60,26 @@
         />
       </a-form-item>
 
-      <a-form-item :label="$t('l_Risk_identified_date')">
+      <!-- <a-form-item :label="$t('l_Risk_identified_date')">
         <a-date-picker
           v-model:value="form.risk_identified_date"
           value-format="YYYY-MM-DD"
           style="width: 100%"
         />
+      </a-form-item> -->
+      <a-form-item :label="$t('l_Planned_visit_date')">
+        <a-date-picker
+          v-model:value="form.planned_visit_date"
+          value-format="YYYY-MM-DD"
+          style="width: 100%"
+        />
+      </a-form-item>
+      <a-form-item :label="$t('l_Survey_reason')">
+        <a-select v-model:value="form.survey_period" style="width: 100%">
+          <a-select-option value="12_weeks">{{ $t('l_12_weeks') }}</a-select-option>
+          <a-select-option value="32_weeks">{{ $t('l_32_weeks') }}</a-select-option>
+          <a-select-option value="unschedule">{{ $t('l_Unschedule') }}</a-select-option>
+        </a-select>
       </a-form-item>
 
       <a-form-item :label="$t('l_Nutrition')">
@@ -73,6 +108,8 @@
         }}</a-button>
       </div>
     </a-form>
+
+
   </a-modal>
 </template>
 
@@ -82,6 +119,7 @@ import { ref, watch, computed } from 'vue'
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { SurveysApi } from '../../api/survey'
+import { KeyApi } from '../../api/key'
 import { useI18n } from 'vue-i18n'
 
 const { t: $t } = useI18n()
@@ -99,11 +137,15 @@ const modalVisible = computed({
 })
 
 const loading = ref(false)
+const keyDates = ref([])
+const keyDatesLoading = ref(false)
 
 const form = ref({
   pregnant_woman: '',
   fill_date: dayjs().format('YYYY-MM-DD'),
   risk_identified_date: dayjs().format('YYYY-MM-DD'),
+  // planned_visit_date: dayjs().format('YYYY-MM-DD'),
+  survey_period: '',
   nutrition: 0,
   depression: 0,
   medical_risks: 0,
@@ -111,12 +153,31 @@ const form = ref({
   social_risks: 0
 })
 
+// Функция для загрузки ключевых дат
+const fetchKeyDates = async () => {
+  if (!props.pregnantWomanId) return
+  
+  keyDatesLoading.value = true
+  try {
+    const { data } = await KeyApi(props.pregnantWomanId, {}, 'GET')
+    keyDates.value = data.key_dates || []
+  } catch (error) {
+    console.error('Failed to load key dates:', error)
+    keyDates.value = []
+  } finally {
+    keyDatesLoading.value = false
+  }
+}
+
 watch(
   () => props.open,
   async (val) => {
     if (val) {
       // Всегда сбрасываем форму при открытии
       resetForm()
+      
+      // Загружаем ключевые даты
+      await fetchKeyDates()
       
       if (props.surveyId) {
         // Если есть surveyId — загружаем данные для редактирования
@@ -126,12 +187,14 @@ watch(
           form.value = {
             pregnant_woman: data.pregnant_woman,
             fill_date: data.fill_date || dayjs().format('YYYY-MM-DD'),
-            risk_identified_date: data.risk_identified_date,
+        //    risk_identified_date: data.risk_identified_date,
             nutrition: data.nutrition,
             depression: data.depression,
             medical_risks: data.medical_risks,
             bad_habits: data.bad_habits,
-            social_risks: data.social_risks
+            social_risks: data.social_risks,
+            survey_period: data.survey_period,
+            planned_visit_date: data.planned_visit_date
           }
         } catch {
           message.error($t('l_Failed_to_load_survey_details'))
@@ -142,6 +205,7 @@ watch(
     } else {
       // Сбрасываем форму при закрытии модалки
       resetForm()
+      keyDates.value = []
     }
   }
 )
@@ -159,12 +223,14 @@ watch(
             form.value = {
               pregnant_woman: data.pregnant_woman,
               fill_date: data.fill_date || dayjs().format('YYYY-MM-DD'),
-              risk_identified_date: data.risk_identified_date,
+       //       risk_identified_date: data.risk_identified_date,
               nutrition: data.nutrition,
               depression: data.depression,
               medical_risks: data.medical_risks,
               bad_habits: data.bad_habits,
-              social_risks: data.social_risks
+              social_risks: data.social_risks,
+              survey_period: data.survey_period,
+              planned_visit_date: data.planned_visit_date
             }
           })
           .catch(() => {
@@ -228,5 +294,9 @@ const handleCancel = () => {
 <style scoped>
 .survey-form .ant-form-item {
   margin-bottom: 8px;
+}
+
+.survey-form .ant-form-item-label > label {
+  font-size: 12px !important;
 }
 </style>

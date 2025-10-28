@@ -27,6 +27,29 @@
       </p>
     </div>
 
+    <!-- Ключевые даты -->
+    <div v-if="keyDates.length > 0" class="mt-4">
+      <h4 class="text-sm font-semibold mb-2">{{ $t('l_Key_dates') }}</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div 
+          v-for="(keyDate, index) in keyDates" 
+          :key="index"
+          class="bg-red-100 border border-red-300 rounded p-3 text-sm"
+        >
+          <div class="font-medium text-red-800">{{ keyDate.period_name }}</div>
+          <div class="text-red-700">
+            <div>{{ $t('l_Date') }}: {{ keyDate.date }}</div>
+            <div v-if="keyDate.range_start && keyDate.range_end">
+              {{ $t('l_Period') }}: {{ keyDate.range_start }} - {{ keyDate.range_end }}
+            </div>
+            <div v-if="keyDate.days_until !== undefined">
+              {{ $t('l_Days_until') }}: {{ keyDate.days_until }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Форма -->
     <a-form :model="form" layout="vertical" class="survey-form">
       <a-form-item :label="$t('l_Fill_date')">
@@ -202,6 +225,7 @@ import { ref, watch, computed } from "vue";
 import dayjs from "dayjs";
 import { message } from "ant-design-vue";
 import { SurveysApi } from "../../api/survey";
+import { KeyApi } from "../../api/key";
 import { useI18n } from "vue-i18n";
 
 const { t: $t } = useI18n();
@@ -219,6 +243,8 @@ const modalVisible = computed({
 });
 
 const loading = ref(false);
+const keyDates = ref([]);
+const keyDatesLoading = ref(false);
 
 const form = ref({
   child: "",
@@ -241,12 +267,31 @@ const form = ref({
   social_risks: 0,
 });
 
+// Функция для загрузки ключевых дат
+const fetchKeyDates = async () => {
+  if (!props.childId) return;
+  
+  keyDatesLoading.value = true;
+  try {
+    const { data } = await KeyApi(props.childId, {}, 'GET');
+    keyDates.value = data.key_dates || [];
+  } catch (error) {
+    console.error('Failed to load key dates:', error);
+    keyDates.value = [];
+  } finally {
+    keyDatesLoading.value = false;
+  }
+};
+
 watch(
   () => props.open,
   async (val) => {
     if (val) {
       // Всегда сбрасываем форму при открытии
       resetForm();
+      
+      // Загружаем ключевые даты
+      await fetchKeyDates();
       
       if (props.surveyId) {
         // Если есть surveyId — загружаем данные для редактирования
@@ -267,6 +312,7 @@ watch(
     } else {
       // Сбрасываем форму при закрытии модалки
       resetForm();
+      keyDates.value = [];
     }
   }
 );

@@ -62,11 +62,12 @@ import { useUserStore } from '../store/index'
   const userStore = useUserStore()
 
   const menuList = computed<MenuItem[]>(() => {
-    const rawMenu = getMenuList()
-    if (userStore.user && userStore.user.is_supervisor) {
+   const rawMenu = getMenuList()
+    if (userStore.user) {
       return rawMenu
     }
-    return rawMenu.filter((item) => item.routerPath !== '/reports')
+    return rawMenu
+    // return rawMenu.filter((item) => item.routerPath !== '/reports')
   })
   
   // Получаем путь текущего маршрута
