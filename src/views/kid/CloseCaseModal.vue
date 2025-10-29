@@ -66,13 +66,13 @@ watch(visible, (newValue) => {
 
 const handleClose = async () => {
   if (!formData.value.closure_note) {
-    message.error($t("l_Fill_all_required_fields"));
-    return;
+    // message.error($t("l_Fill_all_required_fields"));
+    // return;
   }
 
   loading.value = true;
   try {
-    await ClosedApi("children/close", {
+    await ClosedApi("children/close/", {
       patient_id: props.patientId,
       closure_note: formData.value.closure_note
     }, "POST");

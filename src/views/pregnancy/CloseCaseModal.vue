@@ -71,14 +71,11 @@ watch(visible, (newValue) => {
 });
 
 const handleClose = async () => {
-  if (!formData.value.closure_note) {
-    message.error($t("l_Fill_all_required_fields"));
-    return;
-  }
+
 
   loading.value = true;
   try {
-    await ClosedApi("pregnant-women/close", {
+    await ClosedApi("pregnant-women/close/", {
       patient_id: props.patientId,
       closure_note: formData.value.closure_note
     }, "POST");

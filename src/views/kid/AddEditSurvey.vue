@@ -29,21 +29,22 @@
 
     <!-- Ключевые даты -->
     <div v-if="keyDates.length > 0" class="mt-4">
-      <h4 class="text-sm font-semibold mb-2">{{ $t('l_Key_dates') }}</h4>
+      <h4 class="text-sm font-semibold mb-2">{{ $t("l_Key_dates") }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div 
-          v-for="(keyDate, index) in keyDates" 
+        <div
+          v-for="(keyDate, index) in keyDates"
           :key="index"
           class="bg-red-100 border border-red-300 rounded p-3 text-sm"
         >
           <div class="font-medium text-red-800">{{ keyDate.period_name }}</div>
           <div class="text-red-700">
-            <div>{{ $t('l_Date') }}: {{ keyDate.date }}</div>
+            <div>{{ $t("l_Date") }}: {{ keyDate.date }}</div>
             <div v-if="keyDate.range_start && keyDate.range_end">
-              {{ $t('l_Period') }}: {{ keyDate.range_start }} - {{ keyDate.range_end }}
+              {{ $t("l_Period") }}: {{ keyDate.range_start }} -
+              {{ keyDate.range_end }}
             </div>
-            <div v-if="keyDate.days_until !== undefined">
-              {{ $t('l_Days_until') }}: {{ keyDate.days_until }}
+            <div v-if="keyDate.days_overdue !== undefined">
+              {{ $t("l_Days_overdue") }}: {{ keyDate.days_overdue }}
             </div>
           </div>
         </div>
@@ -51,14 +52,62 @@
     </div>
 
     <!-- Форма -->
-    <a-form :model="form" layout="vertical" class="survey-form">
-      <a-form-item :label="$t('l_Fill_date')">
-        <a-date-picker
-          v-model:value="form.fill_date"
-          value-format="YYYY-MM-DD"
-          style="width: 100%"
-        />
-      </a-form-item>
+
+    <a-form :model="form" layout="vertical" class="survey-form mt-4">
+      <div class="grid grid-cols-2 gap-4">
+        <a-form-item :label="$t('l_Fill_date')">
+          <a-date-picker
+            v-model:value="form.fill_date"
+            value-format="YYYY-MM-DD"
+            style="width: 100%"
+          />
+        </a-form-item>
+      
+         <a-form-item :label="$t('l_Planned_visit_date')">
+           <a-date-picker
+             v-model:value="form.planned_visit_date"
+             value-format="YYYY-MM-DD"
+             :disabled-date="disabledDate"
+             style="width: 100%"
+           />
+         </a-form-item>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <a-form-item :label="$t('l_Survey_reason')">
+          <a-select v-model:value="form.survey_period" style="width: 100%">
+            <a-select-option value="first_3_days">{{
+              $t("l_First_3_days")
+            }}</a-select-option>
+            <a-select-option value="14_days">{{
+              $t("l_14_days")
+            }}</a-select-option>
+            <a-select-option value="1_5_months">{{
+              $t("l_1_5_months")
+            }}</a-select-option>
+            <a-select-option value="5_months">{{
+              $t("l_5_months")
+            }}</a-select-option>
+            <a-select-option value="9_months">{{
+              $t("l_9_months")
+            }}</a-select-option>
+            <a-select-option value="15_months">{{
+              $t("l_15_months")
+            }}</a-select-option>
+            <a-select-option value="21_months">{{
+              $t("l_21_months")
+            }}</a-select-option>
+            <a-select-option value="33_months">{{
+              $t("l_33_months")
+            }}</a-select-option>
+            <a-select-option value="unscheduled">{{
+              $t("l_Unscheduled")
+            }}</a-select-option>
+            <a-select-option value="">{{
+              $t("l_Not_specified")
+            }}</a-select-option>
+          </a-select>
+        </a-form-item>
+      </div>
 
       <!-- 16 критериев -->
       <div class="grid grid-cols-2 gap-4">
@@ -209,7 +258,6 @@
 
       <!-- Автовычисления -->
       <a-divider />
-   
 
       <div class="flex justify-end gap-2">
         <a-button type="primary" @click="handleSubmit">{{
@@ -233,7 +281,7 @@ const { t: $t } = useI18n();
 const props = defineProps({
   open: { type: Boolean },
   childId: { type: String, required: false },
-  surveyId: { type: String, required: false }
+  surveyId: { type: String, required: false },
 });
 const emit = defineEmits(["update:open", "success"]);
 
@@ -248,7 +296,9 @@ const keyDatesLoading = ref(false);
 
 const form = ref({
   child: "",
-  fill_date: dayjs().format('YYYY-MM-DD'),
+  fill_date: dayjs().format("YYYY-MM-DD"),
+  planned_visit_date: "",
+  survey_period: "",
   breastfeeding: 0,
   complementary_feeding: 0,
   attachment: 0,
@@ -270,13 +320,13 @@ const form = ref({
 // Функция для загрузки ключевых дат
 const fetchKeyDates = async () => {
   if (!props.childId) return;
-  
+
   keyDatesLoading.value = true;
   try {
-    const { data } = await KeyApi(props.childId, {}, 'GET');
+    const { data } = await KeyApi(props.childId, {}, "GET");
     keyDates.value = data.key_dates || [];
   } catch (error) {
-    console.error('Failed to load key dates:', error);
+    console.error("Failed to load key dates:", error);
     keyDates.value = [];
   } finally {
     keyDatesLoading.value = false;
@@ -289,10 +339,10 @@ watch(
     if (val) {
       // Всегда сбрасываем форму при открытии
       resetForm();
-      
+
       // Загружаем ключевые даты
       await fetchKeyDates();
-      
+
       if (props.surveyId) {
         // Если есть surveyId — загружаем данные для редактирования
         loading.value = true;
@@ -346,15 +396,25 @@ watch(
 // Авторасчёты
 const totalScore = computed(() => {
   return Object.entries(form.value)
-    .filter(([k]) => !["child", "fill_date"].includes(k))
+    .filter(
+      ([k]) =>
+        !["child", "fill_date", "planned_visit_date", "survey_period"].includes(
+          k
+        )
+    )
     .reduce((sum, [_, v]) => sum + (Number(v) || 0), 0);
 });
 
 const maxScore = computed(() => {
   const values = Object.entries(form.value)
-    .filter(([k]) => !["child", "fill_date"].includes(k))
+    .filter(
+      ([k]) =>
+        !["child", "fill_date", "planned_visit_date", "survey_period"].includes(
+          k
+        )
+    )
     .map(([_, v]) => Number(v) || 0);
-  
+
   return Math.max(...values);
 });
 
@@ -384,7 +444,16 @@ const handleSubmit = () => {
     form.value.child = props.childId;
   }
 
-  SurveysApi(url, form.value, method)
+  // Filter out empty survey_period and planned_visit_date
+  const submitData = { ...form.value };
+  if (!submitData.survey_period || submitData.survey_period === "") {
+    delete submitData.survey_period;
+  }
+  if (!submitData.planned_visit_date || submitData.planned_visit_date === "") {
+    delete submitData.planned_visit_date;
+  }
+
+  SurveysApi(url, submitData, method)
     .then(() => {
       message.success(
         props.surveyId
@@ -398,7 +467,9 @@ const handleSubmit = () => {
     })
     .catch(() => {
       message.error(
-        props.surveyId ? $t("l_Error_updating_survey") : $t("l_Error_creating_survey")
+        props.surveyId
+          ? $t("l_Error_updating_survey")
+          : $t("l_Error_creating_survey")
       );
     })
     .finally(() => {
@@ -409,7 +480,9 @@ const handleSubmit = () => {
 const resetForm = () => {
   form.value = {
     child: props.childId,
-    fill_date: dayjs().format('YYYY-MM-DD'),
+    fill_date: dayjs().format("YYYY-MM-DD"),
+    planned_visit_date: "",
+    survey_period: "",
     breastfeeding: 0,
     complementary_feeding: 0,
     attachment: 0,
@@ -433,6 +506,12 @@ const handleCancel = () => {
   modalVisible.value = false;
   // Сбрасываем форму при закрытии
   resetForm();
+};
+
+// Функция для отключения прошедших дат
+const disabledDate = (current) => {
+  // Отключаем все даты до сегодняшнего дня (не включая сегодня)
+  return current && current < dayjs().startOf('day');
 };
 </script>
 

@@ -39,8 +39,8 @@
             <div v-if="keyDate.range_start && keyDate.range_end">
               {{ $t('l_Period') }}: {{ keyDate.range_start }} - {{ keyDate.range_end }}
             </div>
-            <div v-if="keyDate.days_until !== undefined">
-              {{ $t('l_Days_until') }}: {{ keyDate.days_until }}
+            <div v-if="keyDate.days_overdue !== undefined">
+              {{ $t('l_Days_overdue') }}: {{ keyDate.days_overdue }}
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@
     <a-form
       :model="form"
       layout="vertical"
-      class="survey-form"
+      class="survey-form mt-4"
     >
       <a-form-item :label="$t('l_Fill_date')">
         <a-date-picker
@@ -71,6 +71,7 @@
         <a-date-picker
           v-model:value="form.planned_visit_date"
           value-format="YYYY-MM-DD"
+          :disabled-date="disabledDate"
           style="width: 100%"
         />
       </a-form-item>
@@ -255,7 +256,16 @@ const handleSubmit = () => {
     ? `pregnant-women/${props.surveyId}/`
     : 'pregnant-women/'
 
-  SurveysApi(url, form.value, method)
+  // Filter out empty survey_period and planned_visit_date
+  const submitData = { ...form.value }
+  if (!submitData.survey_period || submitData.survey_period === '') {
+    delete submitData.survey_period
+  }
+  if (!submitData.planned_visit_date || submitData.planned_visit_date === '') {
+    delete submitData.planned_visit_date
+  }
+
+  SurveysApi(url, submitData, method)
     .then(() => {
       message.success(props.surveyId ? $t('l_Survey_updated_successfully') : $t('l_Survey_created_successfully'))
       emit('success')
@@ -288,6 +298,12 @@ const handleCancel = () => {
   // Сбрасываем форму при закрытии
   resetForm()
   modalVisible.value = false
+}
+
+// Функция для отключения прошедших дат
+const disabledDate = (current) => {
+  // Отключаем все даты до сегодняшнего дня (не включая сегодня)
+  return current && current < dayjs().startOf('day')
 }
 </script>
 

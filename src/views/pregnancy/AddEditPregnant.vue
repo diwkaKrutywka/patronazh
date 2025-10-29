@@ -25,12 +25,12 @@
           <a-date-picker v-model:value="form.birth_date" format="YYYY-MM-DD" style="width: 100%" />
         </a-form-item>
   
-        <a-form-item :label="$t('l_Visit_date')" name="visit_date">
-          <a-date-picker v-model:value="form.visit_date" format="YYYY-MM-DD" style="width: 100%" />
+        <a-form-item :label="$t('l_Pregnancy_weeks_at_registration')" name="pregnancy_weeks_at_registration">
+          <a-input-number v-model:value="form.pregnancy_weeks_at_registration" :min="1" :max="42" style="width: 100%" />
         </a-form-item>
-  
-        <a-form-item :label="$t('l_Due_date_12_weeks')" name="due_date_12_weeks">
-          <a-date-picker v-model:value="form.due_date_12_weeks" format="YYYY-MM-DD" style="width: 100%" />
+
+        <a-form-item :label="$t('l_Pregnancy_start_date')" name="pregnancy_start_date">
+          <a-date-picker v-model:value="form.pregnancy_start_date" format="YYYY-MM-DD" style="width: 100%" />
         </a-form-item>
   
         <a-form-item :label="$t('l_Address')" name="address">
@@ -75,16 +75,16 @@
     full_name: string;
     iin: string;
     birth_date: any;
-    visit_date: any;
-    due_date_12_weeks: any;
+    pregnancy_weeks_at_registration: number | null;
+    pregnancy_start_date: any;
     address: string;
     phone_number: string;
   }>({
     full_name: "",
     iin: "",
     birth_date: null,
-    visit_date: null,
-    due_date_12_weeks: null,
+    pregnancy_weeks_at_registration: null,
+    pregnancy_start_date: null,
     address: "",
     phone_number: "+7",
   });
@@ -96,8 +96,7 @@
       { len: 12, message: $t("l_IIN_length_error") },
     ],
     birth_date: [{ required: true, message: $t("l_Required_field") }],
-    visit_date: [{ required: true, message: $t("l_Required_field") }],
-    due_date_12_weeks: [{ required: true, message: $t("l_Required_field") }],
+    pregnancy_weeks_at_registration: [{ required: true, message: $t("l_Required_field") }],
     address: [{ required: true, message: $t("l_Required_field") }],
     phone_number: [{ required: true, message: $t("l_Required_field") }],
   };
@@ -115,8 +114,8 @@
         full_name: data.full_name,
         iin: data.iin,
         birth_date: data.birth_date ? dayjs(data.birth_date) : null,
-        visit_date: data.visit_date ? dayjs(data.visit_date) : null,
-        due_date_12_weeks: data.due_date_12_weeks ? dayjs(data.due_date_12_weeks) : null,
+        pregnancy_weeks_at_registration: data.pregnancy_weeks_at_registration || null,
+        pregnancy_start_date: data.pregnancy_start_date ? dayjs(data.pregnancy_start_date) : null,
         address: data.address,
         phone_number: data.phone_number || "+7",
       };
@@ -129,12 +128,15 @@
     formRef.value.validate().then(async () => {
       loading.value = true;
       try {
-        const payload = {
+        const payload: any = {
           ...form.value,
           birth_date: form.value.birth_date ? dayjs(form.value.birth_date).format("YYYY-MM-DD") : null,
-          visit_date: form.value.visit_date ? dayjs(form.value.visit_date).format("YYYY-MM-DD") : null,
-          due_date_12_weeks: form.value.due_date_12_weeks ? dayjs(form.value.due_date_12_weeks).format("YYYY-MM-DD") : null,
         };
+        
+        // Only include pregnancy_start_date if it has a value
+        if (form.value.pregnancy_start_date) {
+          payload.pregnancy_start_date = dayjs(form.value.pregnancy_start_date).format("YYYY-MM-DD");
+        }
         if (props.id) {
           await PregnantApi(`${props.id}/`, payload, "PUT");
           message.success($t("l_Update_success"));
@@ -162,8 +164,8 @@
             full_name: "",
             iin: "",
             birth_date: null,
-            visit_date: null,
-            due_date_12_weeks: null,
+            pregnancy_weeks_at_registration: null,
+            pregnancy_start_date: null,
             address: "",
             phone_number: "+7",
           };
