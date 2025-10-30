@@ -271,7 +271,7 @@
     <PregnantDetail
       :visible="detailVisible"
       :id="selectedId"
-      @close="detailVisible = false"
+      @close="detailVisible = false; fetchPregnantWomen()"
     />
     <add-edit-pregnant
       v-model:open="modalVisible"

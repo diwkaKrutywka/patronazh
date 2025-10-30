@@ -264,7 +264,7 @@ upload
     <kid-details
       :visible="detailsVisible"
       :id="selectedKid"
-      @close="detailsVisible = false"
+      @close="detailsVisible = false; fetchKids()"
     />
   </div>
 </template>
