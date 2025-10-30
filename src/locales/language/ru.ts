@@ -81,6 +81,7 @@ export default {
   l_Social_risks: "Социальные риски",
   l_Download_excel: "Скачать Excel",
   l_Filter: "Фильтр",
+  l_Visit_status_color: "Цвет статуса визита",
   l_Age_group: "Возрастная группа",
   l_Age_min: "Мин. возраст (мес.)",
   l_Age_max: "Макс. возраст (мес.)",

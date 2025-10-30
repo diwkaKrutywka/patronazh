@@ -81,6 +81,7 @@ export default {
   l_Social_risks: "Social risks",
   l_Download_excel: "Download Excel",
   l_Filter: "Filter",
+  l_Visit_status_color: "Visit status color",
   l_Age_group: "Age group",
   l_Age_min: "Min age (months)",
   l_Age_max: "Max age (months)",

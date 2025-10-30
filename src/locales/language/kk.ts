@@ -81,6 +81,7 @@ export default {
   l_Social_risks: "Әлеуметтік қауіптер",
   l_Download_excel: "Excel жүктеу",
   l_Filter: "Сүзгі",
+  l_Visit_status_color: "Келу статусының түсі",
   l_Age_group: "Жас тобы",
   l_Age_min: "Ең аз жас (ай)",
   l_Age_max: "Ең көп жас (ай)",

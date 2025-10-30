@@ -112,6 +112,22 @@
                     :getPopupContainer="getPopupContainer"
                   />
                 </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.visit_status_color"
+                    mode="multiple"
+                    :placeholder="$t('l_Visit_status_color')"
+                    allowClear
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="RED">{{ $t('l_RED') }}</a-select-option>
+                    <a-select-option value="YELLOW">{{ $t('l_YELLOW') }}</a-select-option>
+                    <a-select-option value="PURPLE">{{ $t('l_PURPLE') }}</a-select-option>
+                    <a-select-option value="GREEN">{{ $t('l_GREEN') }}</a-select-option>
+                  </a-select>
+                </div>
                 <div class="sm:col-span-2">
                   <a-range-picker
                     v-model:value="currentFilters.survey_date_range"
@@ -579,6 +595,9 @@ const fetchKids = async () => {
       }
       if (has_surveys !== undefined && has_surveys !== null && has_surveys !== '') {
         queryParams.has_surveys = String(has_surveys) === 'true';
+      }
+      if (Array.isArray(currentFilters.value.visit_status_color) && currentFilters.value.visit_status_color.length > 0) {
+        queryParams.visit_status_color = currentFilters.value.visit_status_color;
       }
       if (no_surveys_range && Array.isArray(no_surveys_range) && no_surveys_range.length === 2) {
         queryParams.no_surveys_from = String(no_surveys_range[0]);

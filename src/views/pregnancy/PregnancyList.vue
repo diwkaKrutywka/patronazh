@@ -101,6 +101,22 @@
                     }}</a-select-option>
                   </a-select>
                 </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.visit_status_color"
+                    mode="multiple"
+                    :placeholder="$t('l_Visit_status_color')"
+                    allowClear
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="RED">{{ $t('l_RED') }}</a-select-option>
+                    <a-select-option value="YELLOW">{{ $t('l_YELLOW') }}</a-select-option>
+                    <a-select-option value="PURPLE">{{ $t('l_PURPLE') }}</a-select-option>
+                    <a-select-option value="GREEN">{{ $t('l_GREEN') }}</a-select-option>
+                  </a-select>
+                </div>
                 <div class="sm:col-span-2">
                   <a-range-picker
                     v-model:value="currentFilters.no_surveys_range"
@@ -577,6 +593,9 @@ const fetchPregnantWomen = async () => {
       ) {
         queryParams.survey_date_from = String(survey_date_range[0]);
         queryParams.survey_date_to = String(survey_date_range[1]);
+      }
+      if (Array.isArray(currentFilters.value.visit_status_color) && currentFilters.value.visit_status_color.length > 0) {
+        queryParams.visit_status_color = currentFilters.value.visit_status_color;
       }
     }
     Object.keys(queryParams).forEach((key) => {

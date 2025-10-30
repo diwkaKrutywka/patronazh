@@ -37,8 +37,9 @@
           class="bg-red-100 border border-red-300 rounded p-3 text-sm"
         >
           <div class="font-medium text-red-800">{{ keyDate.period_name }}</div>
-          <div class="text-red-700">
-            <div>{{ $t("l_Date") }}: {{ keyDate.date }}</div>
+            <div class="text-red-700">
+              <div>{{ $t("l_Date") }}:<br>{{ keyDate.date_str }}</div>
+              <div> {{ keyDate.date }}</div>
             <div v-if="keyDate.range_start && keyDate.range_end">
               {{ $t("l_Period") }}: {{ keyDate.range_start }} -
               {{ keyDate.range_end }}

@@ -11,6 +11,23 @@ const http = axios.create({
     'ngrok-skip-browser-warning': '69420',
     'Content-Type': 'application/json;charset=UTF-8',
   },
+  // Ensure arrays are serialized as repeated keys: foo=a&foo=b
+  paramsSerializer: {
+    serialize: (params: Record<string, any>) => {
+      const usp = new URLSearchParams()
+      Object.entries(params || {}).forEach(([key, value]) => {
+        if (value == null || value === '') return
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            if (v != null && v !== '') usp.append(key, String(v))
+          })
+        } else {
+          usp.append(key, String(value))
+        }
+      })
+      return usp.toString()
+    },
+  },
 })
 
 // Request interceptor — добавляем токен
