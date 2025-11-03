@@ -8,7 +8,7 @@ import type { AxiosRequestConfig, AxiosResponse, Method } from 'axios'
     options?: { fileDownload?: boolean; fileUpload?: boolean }
   ): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
-      url: `closed-cases/${url}`,
+      url: `closed-cases/${url}/`,
       method,
     }
   
