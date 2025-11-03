@@ -282,30 +282,40 @@ const handleTableChange = (pag: any) => {
 };
 
 // ======== Загрузка данных ребёнка ========
-watch(
-  () => props.id,
-  async (newId) => {
-    if (props.visible && newId) {
-      data.value = null;
-      try {
-        const { data: res } = await KidsApi(`${newId}/`, {}, "GET");
-        data.value = res;
+const loadKidData = async () => {
+  if (!props.visible || !props.id) return;
+  
+  data.value = null;
+  try {
+    const { data: res } = await KidsApi(`${props.id}/`, {}, "GET");
+    data.value = res;
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Failed_to_load_kid_details"));
+  }
+};
 
-        fetchSurveys();
-      } catch {
-        message.error($t("l_Failed_to_load_kid_details"));
-      }
-    }
-  },
-  { immediate: true }
-);
+// watch(
+//   () => props.id,
+//   async (newId) => {
+//     if (props.visible && newId) {
+//       await loadKidData();
+//     }
+//   },
+//   { immediate: true }
+// );
 
 watch(
   () => props.visible,
-  (isVisible) => {
-    if (!isVisible) {
+  async (isVisible) => {
+    if (isVisible && props.id) {
+      // Загружаем данные при открытии компонента
+      await loadKidData();
+    } else if (!isVisible) {
+      // Очищаем данные при закрытии
       data.value = null;
       surveys.value = [];
+      pagination.value.current = 1;
     }
   }
 );

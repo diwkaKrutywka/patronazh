@@ -212,7 +212,7 @@ import { Avatar, message, Tag } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { ClosedApi } from "../../api/closed";
 import dayjs from "dayjs";
-import type { TableRenderProps } from "../../types/table";
+//import type { TableRenderProps } from "../../types/table";
 import ReopenPregnancyModal from "../pregnancy/ReopenCaseModal.vue";
 import ReopenKidModal from "../kid/ReopenCaseModal.vue";
 

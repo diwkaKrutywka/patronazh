@@ -277,29 +277,39 @@ const handleTableChange = (pag: any) => {
 };
 
 // ======== Загрузка данных беременной ========
-watch(
-  () => props.id,
-  async (newId) => {
-    if (props.visible && newId) {
-      data.value = null;
-      try {
-        const { data: res } = await PregnantApi(`${newId}/`, {}, "GET");
-        data.value = res;
-        fetchSurveys();
-      } catch {
-        message.error($t("l_Failed_to_load_pregnant_details"));
-      }
-    }
-  },
-  { immediate: true }
-);
+const loadPregnantData = async () => {
+  if (!props.visible || !props.id) return;
+  
+  data.value = null;
+  try {
+    const { data: res } = await PregnantApi(`${props.id}/`, {}, "GET");
+    data.value = res;
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Failed_to_load_pregnant_details"));
+  }
+};
+
+// watch(
+//   () => props.id,
+//   async () => {
+//     if (props.visible && props.id) {
+//       await loadPregnantData();
+//     }
+//   }
+// );
 
 watch(
   () => props.visible,
-  (isVisible) => {
-    if (!isVisible) {
+  async (isVisible) => {
+    if (isVisible && props.id) {
+      // Загружаем данные при открытии компонента
+      await loadPregnantData();
+    } else if (!isVisible) {
+      // Очищаем данные при закрытии
       data.value = null;
       surveys.value = [];
+      pagination.value.current = 1;
     }
   }
 );

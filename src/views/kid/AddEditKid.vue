@@ -120,7 +120,7 @@ watch(
 const fetchKid = async (id: string) => {
   try {
     loading.value = true;
-    const { data } = await KidsApi<KidForm>(id, {}, "GET");
+    const { data } = await KidsApi<KidForm>(`${id}/`, {}, "GET");
     Object.assign(form, data);
   } catch (err) {
     message.error($t("l_Load_error"));
