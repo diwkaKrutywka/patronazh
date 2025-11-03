@@ -33,7 +33,9 @@ html * {
 .ant-table-cell-row-hover {
   background-color: #e7ecf0 !important;
 }
-
+.ant-modal-title {
+  background-color: #f3f6f8 !important;
+}
 .search-input :deep(.ant-input-search-button .anticon) {
   display: flex;
   align-items: center;

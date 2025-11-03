@@ -14,9 +14,9 @@
       <p class="font-semibold mt-2 text-xs">{{ $t('survey_info_risk_system') }}</p>
       <ul class="list-disc ml-5 text-xs">
         <li>{{ $t('survey_info_score_range') }}</li>
-        <li><strong>0</strong> — {{ $t('survey_info_score_0') }}</li>
-        <li><strong>1</strong> — {{ $t('survey_info_score_1') }}</li>
-        <li><strong>2</strong> — {{ $t('survey_info_score_2') }}</li>
+        <li>0 — {{ $t("survey_info_score_0") }} 🟢</li>
+        <li>1 — {{ $t("survey_info_score_1") }} 🟡</li>
+        <li>2 — {{ $t("survey_info_score_2") }} 🔴</li>
       </ul>
       <p class="font-semibold mt-2 text-xs">{{ $t('survey_info_overall') }}</p>
       <ul class="list-disc ml-5 text-xs">

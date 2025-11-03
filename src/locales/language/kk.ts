@@ -258,4 +258,6 @@ export default {
   l_Pregnancy_weeks_at_registration: "Тіркелу кезіндегі жүктілік аптасы",
   l_Pregnancy_start_date: "Жүктіліктің басталу күні",
   l_Days_overdue: "Қалған күндер",
+  l_Has_risk: "Қауіп бар",
+  l_IIN_length_error: "ЖСН дәл 12 цифрдан тұруы керек",
 };

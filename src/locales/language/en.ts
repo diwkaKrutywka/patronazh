@@ -256,4 +256,6 @@ export default {
   l_Pregnancy_weeks_at_registration: "Pregnancy weeks at registration",
   l_Pregnancy_start_date: "Pregnancy start date",
   l_Days_overdue: "Days overdue",
+  l_Has_risk: "Has risk",
+  l_IIN_length_error: "IIN must contain exactly 12 digits",
 };

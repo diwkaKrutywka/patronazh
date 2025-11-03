@@ -259,4 +259,6 @@ export default {
   l_Pregnancy_weeks_at_registration: "Срок беременности на момент регистрации",
   l_Pregnancy_start_date: "Точная дата начала беременности",
   l_Days_overdue: "Дней просрочено",
+  l_Has_risk: "Есть риск",
+  l_IIN_length_error: "ИИН должен содержать ровно 12 цифр",
 };

@@ -374,6 +374,16 @@ const columns = [
     width: 200,
     ellipsis: true,
   },
+  {
+    title: $t("l_Has_risk"),
+    dataIndex: "is_in_progressive_package",
+    width: 60,
+    responsive: ["sm"],
+    ellipsis: true,
+    customRender: ({ text }: TableRenderProps<Pregnant>) => {
+      return h(Tag, { color: text ? "red" : "gray" }, () => text ? $t("l_Yes") : $t("l_No"));
+    },
+  },
   { 
     title: $t("l_IIN"), 
     dataIndex: "iin", 

@@ -410,11 +410,11 @@ const columns = [
   {
     title: $t("l_Has_risk"),
     dataIndex: "is_in_progressive_package",
-    width: 120,
+    width: 60,
     responsive: ["sm"],
     ellipsis: true,
     customRender: ({ text }: TableRenderProps<Kid>) => {
-      return h(Tag, { color: text ? "green" : "red" }, () => text ? $t("l_Yes") : $t("l_No"));
+      return h(Tag, { color: text ? "red" : "gray" }, () => text ? $t("l_Yes") : $t("l_No"));
     },
   },
   {

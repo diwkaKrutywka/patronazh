@@ -22,7 +22,12 @@
         </a-form-item>
   
         <a-form-item :label="$t('l_Birth_date')" name="birth_date">
-          <a-date-picker v-model:value="form.birth_date" format="YYYY-MM-DD" style="width: 100%" />
+          <a-date-picker 
+            v-model:value="form.birth_date" 
+            format="YYYY-MM-DD" 
+            style="width: 100%"
+            :disabled-date="disabledDate"
+          />
         </a-form-item>
   
         <a-form-item :label="$t('l_Pregnancy_weeks_at_registration')" name="pregnancy_weeks_at_registration">
@@ -38,7 +43,7 @@
         </a-form-item>
 
         <a-form-item :label="$t('l_Phone_number')" name="phone_number">
-          <a-input v-model:value="form.phone_number" />
+          <a-input v-model:value="form.phone_number" @input="handlePhoneInput" />
         </a-form-item>
         <div class="flex justify-end gap-2 mt-4">
         <a-button type="primary" @click="handleSubmit">{{
@@ -55,6 +60,7 @@
   import { useI18n } from "vue-i18n";
   import { PregnantApi } from "../../api/pregnancy";
   import dayjs from "dayjs";
+  import { formatPhoneNumber } from "../../utils/phone";
   
   const props = defineProps<{
     id?: string | null;
@@ -86,7 +92,7 @@
     pregnancy_weeks_at_registration: null,
     pregnancy_start_date: null,
     address: "",
-    phone_number: "+7",
+    phone_number: formatPhoneNumber("+7"),
   });
   
   const rules = {
@@ -104,6 +110,17 @@
   const closeModal = () => {
     emit("update:open", false);
   };
+
+  const handlePhoneInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const formatted = formatPhoneNumber(target.value);
+    form.value.phone_number = formatted;
+  };
+
+  const disabledDate = (current: any) => {
+    // Блокируем будущие даты
+    return current && current > dayjs().endOf("day");
+  };
   
   const loadData = async () => {
     if (!props.id) return;
@@ -117,7 +134,7 @@
         pregnancy_weeks_at_registration: data.pregnancy_weeks_at_registration || null,
         pregnancy_start_date: data.pregnancy_start_date ? dayjs(data.pregnancy_start_date) : null,
         address: data.address,
-        phone_number: data.phone_number || "+7",
+        phone_number: formatPhoneNumber(data.phone_number || "+7"),
       };
     } finally {
       loading.value = false;
@@ -167,7 +184,7 @@
             pregnancy_weeks_at_registration: null,
             pregnancy_start_date: null,
             address: "",
-            phone_number: "+7",
+            phone_number: formatPhoneNumber("+7"),
           };
         }
       }
