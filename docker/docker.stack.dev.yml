@@ -59,6 +59,7 @@ networks:
   traefik_internal:
     external: true
 
+
 # Закомментировано - используем конфиг из образа
 # configs:
 #   patronage_conf:
