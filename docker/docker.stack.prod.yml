@@ -40,10 +40,10 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik_internal"
-        - "traefik.http.routers.patronage-front-http.rule=Host(`${PATRONAGE_PREFIX}${DOMAIN}`)"
+        - "traefik.http.routers.patronage-front-http.rule=Host(`${PREFIX}${DOMAIN}`)"
         - "traefik.http.routers.patronage-front-http.entrypoints=web"
         - "traefik.http.routers.patronage-front-http.middlewares=redirect-to-https"
-        - "traefik.http.routers.patronage-front-https.rule=Host(`${PATRONAGE_PREFIX}${DOMAIN}`)"
+        - "traefik.http.routers.patronage-front-https.rule=Host(`${PREFIX}${DOMAIN}`)"
         - "traefik.http.routers.patronage-front-https.entrypoints=websecure"
         - "traefik.http.routers.patronage-front-https.tls=true"
         - "traefik.http.routers.patronage-front-https.tls.certresolver=letsencrypt"
