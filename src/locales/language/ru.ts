@@ -261,4 +261,5 @@ export default {
   l_Days_overdue: "Дней просрочено",
   l_Has_risk: "Есть риск",
   l_IIN_length_error: "ИИН должен содержать ровно 12 цифр",
+  l_Phone_format_error: "Номер телефона должен быть в формате +7 (7ХХ)ХХХ-ХХ-ХХ",
 };

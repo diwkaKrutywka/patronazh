@@ -23,7 +23,7 @@
 
     <!-- Right section -->
     <div class="flex items-center gap-4 z-10">
-      <ChangeLanguageBox class="flex items-center" />
+      <ChangeLanguageBox class="flex items-center cursor-pointer" />
 
    
 

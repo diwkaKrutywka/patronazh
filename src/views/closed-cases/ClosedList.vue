@@ -474,7 +474,7 @@ const handleReopenSuccess = () => {
 
 const downloadExcel = async () => {
   try {
-    const response = await ClosedApi(`${activeKey.value}/download/`, {}, "GET", {
+    const response = await ClosedApi(`${activeKey.value}/download`, {}, "GET", {
       fileDownload: true,
     });
     const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });

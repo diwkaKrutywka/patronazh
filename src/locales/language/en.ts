@@ -258,4 +258,5 @@ export default {
   l_Days_overdue: "Days overdue",
   l_Has_risk: "Has risk",
   l_IIN_length_error: "IIN must contain exactly 12 digits",
+  l_Phone_format_error: "Phone number must be in format +7 (7XX)XXX-XX-XX",
 };

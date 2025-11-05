@@ -54,7 +54,7 @@ import { ref, watch, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { message } from "ant-design-vue";
 import { KidsApi } from "../../api/kids";
-import { formatPhoneNumber } from "../../utils/phone";
+import { formatPhoneNumber, validatePhoneNumber } from "../../utils/phone";
 import dayjs from "dayjs";
 
 interface KidForm {
@@ -101,7 +101,17 @@ const rules = {
   birth_date: [{ required: true, message: $t("l_Required_field") }],
   gender: [{ required: true, message: $t("l_Required_field") }],
   address: [{ required: true, message: $t("l_Required_field") }],
-  phone_number: [{ required: true, message: $t("l_Required_field") }],
+  phone_number: [
+    { required: true, message: $t("l_Required_field") },
+    {
+      validator: (_rule: any, value: string) => {
+        if (!value || !validatePhoneNumber(value)) {
+          return Promise.reject($t("l_Phone_format_error"));
+        }
+        return Promise.resolve();
+      },
+    },
+  ],
 };
 
 const disabledDate = (current: any) => {

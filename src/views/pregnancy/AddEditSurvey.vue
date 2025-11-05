@@ -80,7 +80,7 @@
         <a-select v-model:value="form.survey_period" style="width: 100%">
           <a-select-option value="12_weeks">{{ $t('l_12_weeks') }}</a-select-option>
           <a-select-option value="32_weeks">{{ $t('l_32_weeks') }}</a-select-option>
-          <a-select-option value="unschedule">{{ $t('l_Unschedule') }}</a-select-option>
+          <a-select-option value="unscheduled">{{ $t('l_Unschedule') }}</a-select-option>
         </a-select>
       </a-form-item>
 

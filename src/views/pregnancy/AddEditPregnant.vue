@@ -26,7 +26,7 @@
             v-model:value="form.birth_date" 
             format="YYYY-MM-DD" 
             style="width: 100%"
-            :disabled-date="disabledDate"
+            :disabled-date="disabledBirthDate"
           />
         </a-form-item>
   
@@ -35,7 +35,12 @@
         </a-form-item>
 
         <a-form-item :label="$t('l_Pregnancy_start_date')" name="pregnancy_start_date">
-          <a-date-picker v-model:value="form.pregnancy_start_date" format="YYYY-MM-DD" style="width: 100%" />
+          <a-date-picker 
+            v-model:value="form.pregnancy_start_date" 
+            format="YYYY-MM-DD" 
+            style="width: 100%"
+            :disabled-date="disabledPregnancyStartDate"
+          />
         </a-form-item>
   
         <a-form-item :label="$t('l_Address')" name="address">
@@ -60,7 +65,7 @@
   import { useI18n } from "vue-i18n";
   import { PregnantApi } from "../../api/pregnancy";
   import dayjs from "dayjs";
-  import { formatPhoneNumber } from "../../utils/phone";
+  import { formatPhoneNumber, validatePhoneNumber } from "../../utils/phone";
   
   const props = defineProps<{
     id?: string | null;
@@ -104,7 +109,17 @@
     birth_date: [{ required: true, message: $t("l_Required_field") }],
     pregnancy_weeks_at_registration: [{ required: true, message: $t("l_Required_field") }],
     address: [{ required: true, message: $t("l_Required_field") }],
-    phone_number: [{ required: true, message: $t("l_Required_field") }],
+    phone_number: [
+      { required: true, message: $t("l_Required_field") },
+      {
+        validator: (_rule: any, value: string) => {
+          if (!value || !validatePhoneNumber(value)) {
+            return Promise.reject($t("l_Phone_format_error"));
+          }
+          return Promise.resolve();
+        },
+      },
+    ],
   };
   
   const closeModal = () => {
@@ -117,9 +132,39 @@
     form.value.phone_number = formatted;
   };
 
-  const disabledDate = (current: any) => {
-    // Блокируем будущие даты
-    return current && current > dayjs().endOf("day");
+  const disabledBirthDate = (current: any) => {
+    if (!current) return false;
+    
+    const today = dayjs();
+    // Минимальный год рождения = текущий год - 12 лет
+    // Блокируем даты после 31 декабря (текущий год - 12 лет)
+    const maxBirthDate = today.subtract(12, 'year').endOf('year');
+    
+    // Блокируем будущие даты и даты после максимальной допустимой даты рождения
+    return current > today.endOf("day") || current > maxBirthDate;
+  };
+
+  const disabledPregnancyStartDate = (current: any) => {
+    if (!current) return false;
+    
+    const today = dayjs();
+    
+    // Максимальная дата - текущий день (нельзя выбрать будущую дату)
+    if (current > today.endOf("day")) {
+      return true;
+    }
+    
+    // Минимальная дата - дата рождения + 12 лет
+    // Если дата рождения не выбрана, разрешаем любую дату (до текущего дня)
+    if (!form.value.birth_date) {
+      return false;
+    }
+    
+    const birthDate = dayjs(form.value.birth_date);
+    const minPregnancyStartDate = birthDate.add(12, 'year').startOf('day');
+    
+    // Блокируем даты раньше минимальной допустимой даты
+    return current < minPregnancyStartDate;
   };
   
   const loadData = async () => {

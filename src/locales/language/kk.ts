@@ -260,4 +260,5 @@ export default {
   l_Days_overdue: "Қалған күндер",
   l_Has_risk: "Қауіп бар",
   l_IIN_length_error: "ЖСН дәл 12 цифрдан тұруы керек",
+  l_Phone_format_error: "Телефон нөмірі +7 (7ХХ)ХХХ-ХХ-ХХ форматында болуы керек",
 };

@@ -391,7 +391,7 @@ const handleReopen = async () => {
 
   loading.value = true;
   try {
-    await ClosedApi("children/create-survey-from-closed/", {
+    await ClosedApi("children/create-survey-from-closed", {
       closed_case: props.patientId,
       reopen_note: formData.value.reopen_note,
       breastfeeding: formData.value.breastfeeding,

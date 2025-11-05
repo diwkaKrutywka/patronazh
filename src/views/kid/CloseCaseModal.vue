@@ -72,7 +72,7 @@ const handleClose = async () => {
 
   loading.value = true;
   try {
-    await ClosedApi("children/close/", {
+    await ClosedApi("children/close", {
       patient_id: props.patientId,
       closure_note: formData.value.closure_note
     }, "POST");
