@@ -25,17 +25,20 @@ RUN CI=false npm run build
 # Этап 2: nginx
 FROM nginx:alpine
 
+# Устанавливаем wget для healthcheck
+RUN apk add --no-cache wget
+
 # Копируем собранный фронт
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Копируем конфиг nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./infra/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Копируем entrypoint script
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
 
-CMD ["/docker-entrypoint.sh"]
+CMD ["/entrypoint.sh"]
 
