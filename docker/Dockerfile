@@ -25,6 +25,9 @@ RUN CI=false npm run build
 # Этап 2: nginx
 FROM nginx:alpine
 
+# Устанавливаем wget для healthcheck
+RUN apk add --no-cache wget
+
 # Копируем собранный фронт
 COPY --from=build /app/dist /usr/share/nginx/html
 
