@@ -1,24 +1,17 @@
 services:
   front:
-    image: ${IMAGE_REGISTRY_URL}:latest
+    image: ${IMAGE_REGISTRY_URL}:{IMAGE_REGISTRY_TAG:-dev}
     ports:
       - "8081:80"
     environment:
       - VITE_BASE_API_URL=${VITE_BASE_API_URL}
       - IMAGE_REGISTRY_URL=${IMAGE_REGISTRY_URL}
+      - IMAGE_REGISTRY_TAG=${IMAGE_REGISTRY_TAG:-dev}
     env_file:
-      - stack.env
+      - ../.env
     networks:
      - frontend-net
-    deploy:
-     replicas: 1
-     restart_policy:
-       condition: on-failure
-     placement:
-       constraints:
-         - node.role == worker
 
 networks:
  frontend-net:
-   external:
-     true
+   
