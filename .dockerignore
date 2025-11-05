@@ -59,13 +59,8 @@ CHANGELOG.md
 LICENSE
 docs/
 
-# Scripts (для разработки)
+# Scripts (для разработки) - исключаем только .bat файлы
 scripts/*.bat
-scripts/start-ngrok.bat
-scripts/test-ngrok.bat
-
-# Infra (уже копируется выборочно в Dockerfile)
-infra
 
 # Прочее
 *.suo
