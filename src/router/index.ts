@@ -25,6 +25,10 @@ const routes: RouteRecordRaw[] = [
         name: "ReportList",
         component: () => import("../views/reports/ReportsList.vue"),
       },
+      {path: "closed-cases",
+        name: "ClosedList",
+        component: () => import("../views/closed-cases/ClosedList.vue"),
+      },
     ],
   },
   {

@@ -15,10 +15,10 @@
       layout="horizontal"
     >
       <a-descriptions-item :label="$t('l_Full_name')">
-       <a-tag color="green">{{ data.full_name }}</a-tag> 
+        <a-tag color="green">{{ data.full_name }}</a-tag>
       </a-descriptions-item>
       <a-descriptions-item :label="$t('l_IIN')">
-       <a-tag color="gray">{{ data.iin }}</a-tag> 
+        <a-tag color="gray">{{ data.iin }}</a-tag>
       </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Birth_date')">
         {{ data.birth_date }}
@@ -35,6 +35,9 @@
       <a-descriptions-item :label="$t('l_Address')">
         {{ data.address }}
       </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Phone_number')">
+        {{ data.phone_number }}
+      </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Organization')">
         {{ data.organization_name }}
       </a-descriptions-item>
@@ -45,22 +48,27 @@
         {{ data.last_survey_date }}
       </a-descriptions-item> -->
       <a-descriptions-item :label="$t('l_Risk_level')">
-       <a-tag color="blue">{{ data.current_risk_level }}</a-tag> 
+        <a-tag color="blue">{{ data.current_risk_level }}</a-tag>
       </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Created_at')">
-  {{ $formatIsoDate(data.created_at) }}
-</a-descriptions-item>
-<a-descriptions-item :label="$t('l_Updated_at')">
-  {{ $formatIsoDate(data.updated_at) }}
-</a-descriptions-item>
-
+        {{ $formatIsoDate(data.created_at) }}
+      </a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Updated_at')">
+        {{ $formatIsoDate(data.updated_at) }}
+      </a-descriptions-item>
     </a-descriptions>
 
-   
+
+    <div 
+      class="flex justify-center items-center my-2 p-4 bg-red-500 rounded-md text-white text-center cursor-pointer hover:bg-red-600 transition-colors"
+      @click="onCloseCase"
+    >
+      <span class="text-white font-bold">{{ $t('l_Close_case') }}</span>
+    </div>
 
     <!-- Список анкет -->
     <template v-if="data">
-      <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200">
+      <div class="flex justify-between items-center mt-4 mb-2 p-4 bg-gray-200">
         <h3>{{ $t("l_Surveys") }}</h3>
         <a-button type="primary" @click="onAddSurvey()">
           <span class="material-symbols-outlined">
@@ -90,7 +98,7 @@
                 />
                 <a-popconfirm
                   placement="leftBottom"
-                  title="Сіз расымен анкетаны өшіргіңіз келеді ме?"
+                  :title="$t('l_Delete_survey_confirmation')"
                   :ok-text="$t('l_Yes')"
                   :cancel-text="$t('l_No')"
                   @confirm="onDelete(record.id)"
@@ -115,6 +123,13 @@
       :surveyId="editingSurveyId"
       @success="fetchSurveys"
     />
+
+    <!-- Модалка закрытия кейса -->
+    <CloseCaseModal
+      v-model:open="closeCaseModalVisible"
+      :patientId="props.id"
+      @success="onCaseClosed"
+    />
   </a-drawer>
 </template>
 
@@ -125,22 +140,24 @@ import { message } from "ant-design-vue";
 import { KidsApi } from "../../api/kids";
 import { SurveysApi } from "../../api/survey";
 import AddEditSurvey from "./AddEditSurvey.vue";
+import CloseCaseModal from "./CloseCaseModal.vue";
 import { useGlobal } from "../../composables/useGlobal"; // путь поправь
 
 const { t: $t } = useI18n();
 const { $formatIsoDate } = useGlobal();
 
-const props = defineProps<{
-  visible: boolean;
-  id: string | null;
-}>();
-
+const props = defineProps({
+  visible: { type: Boolean, required: true },
+  id: { type: String, default: null },
+});
 const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
 
 // ======== Responsive settings ========
-const windowWidth = ref<number>(typeof window !== "undefined" ? window.innerWidth : 1024);
+const windowWidth = ref<number>(
+  typeof window !== "undefined" ? window.innerWidth : 1024
+);
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
 };
@@ -155,14 +172,15 @@ onUnmounted(() => {
 });
 
 const isMobile = computed(() => windowWidth.value < 640);
-const isTablet = computed(() => windowWidth.value >= 640 && windowWidth.value < 1024);
+const isTablet = computed(
+  () => windowWidth.value >= 640 && windowWidth.value < 1024
+);
 
 const drawerWidth = computed<string | number>(() => {
   if (isMobile.value) return "100%";
   if (isTablet.value) return 640;
   return 800;
 });
-
 
 // ======== Пагинация ========
 const pagination = ref({
@@ -179,7 +197,10 @@ const pagination = ref({
 const surveys = ref([]);
 const loadingSurveys = ref(false);
 const surveyModalVisible = ref(false);
-const editingSurveyId = ref<string | null>(null);
+const editingSurveyId = ref<string>();
+
+// ======== Закрытие кейса ========
+const closeCaseModalVisible = ref(false);
 
 const surveyColumns = [
   {
@@ -205,8 +226,18 @@ const surveyColumns = [
 ];
 
 const onAddSurvey = () => {
-  editingSurveyId.value = null;
+  editingSurveyId.value = undefined;
   surveyModalVisible.value = true;
+};
+
+const onCloseCase = () => {
+  closeCaseModalVisible.value = true;
+};
+
+const onCaseClosed = () => {
+  // Close the drawer after successful case closure
+  emit("close");
+  message.success($t("l_Case_closed_successfully"));
 };
 
 const onEdit = (record: any) => {
@@ -251,30 +282,40 @@ const handleTableChange = (pag: any) => {
 };
 
 // ======== Загрузка данных ребёнка ========
-watch(
-  () => props.id,
-  async (newId) => {
-    if (props.visible && newId) {
-      data.value = null;
-      try {
-        const { data: res } = await KidsApi(`${newId}/`, {}, "GET");
-        data.value = res;
-       
-        fetchSurveys();
-      } catch {
-        message.error($t("l_Failed_to_load_kid_details"));
-      }
-    }
-  },
-  { immediate: true }
-);
+const loadKidData = async () => {
+  if (!props.visible || !props.id) return;
+  
+  data.value = null;
+  try {
+    const { data: res } = await KidsApi(`${props.id}/`, {}, "GET");
+    data.value = res;
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Failed_to_load_kid_details"));
+  }
+};
+
+// watch(
+//   () => props.id,
+//   async (newId) => {
+//     if (props.visible && newId) {
+//       await loadKidData();
+//     }
+//   },
+//   { immediate: true }
+// );
 
 watch(
   () => props.visible,
-  (isVisible) => {
-    if (!isVisible) {
+  async (isVisible) => {
+    if (isVisible && props.id) {
+      // Загружаем данные при открытии компонента
+      await loadKidData();
+    } else if (!isVisible) {
+      // Очищаем данные при закрытии
       data.value = null;
       surveys.value = [];
+      pagination.value.current = 1;
     }
   }
 );

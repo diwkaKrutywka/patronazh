@@ -30,20 +30,24 @@
         data.pregnancy_weeks
       }}</a-tag></a-descriptions-item>
       <a-descriptions-item :label="$t('l_Due_date_12_weeks')">{{
-        data.due_date_12_weeks
-      }}</a-descriptions-item>
+        data.due_date_12_weeks?.start
+      }} - {{ data.due_date_12_weeks?.end }}</a-descriptions-item>
       <a-descriptions-item :label="$t('l_Due_date_32_weeks')">{{
-        data.due_date_32_weeks
-      }}</a-descriptions-item>
+        data.due_date_32_weeks?.start
+      }} - {{ data.due_date_32_weeks?.end }}
+      </a-descriptions-item>
       <a-descriptions-item :label="$t('l_Address')">{{
         data.address
+      }}</a-descriptions-item>
+      <a-descriptions-item :label="$t('l_Phone_number')">{{
+        data.phone_number
       }}</a-descriptions-item>
       <a-descriptions-item :label="$t('l_Organization')">{{
         data.organization_name
       }}</a-descriptions-item>
-      <a-descriptions-item :label="$t('l_Monitoring_category')">{{
+      <!-- <a-descriptions-item :label="$t('l_Monitoring_category')">{{
         data.monitoring_category
-      }}</a-descriptions-item>
+      }}</a-descriptions-item> -->
       <a-descriptions-item :label="$t('l_Created_at')">
         {{ $formatIsoDate(data.created_at) }}
       </a-descriptions-item>
@@ -53,6 +57,15 @@
     </a-descriptions>
 
     <div v-else class="text-center py-5"><a-spin /> {{ $t("l_Loading") }}</div>
+
+    <!-- Close Case Button -->
+    <div 
+      v-if="data"
+      class="flex justify-center items-center my-4 p-4 bg-red-500 rounded-md text-white text-center cursor-pointer hover:bg-red-600 transition-colors"
+      @click="onCloseCase"
+    >
+      <span class="text-white font-bold">{{ $t('l_Close_case') }}</span>
+    </div>
 
     <!-- Список анкет -->
     <template v-if="data">
@@ -86,7 +99,7 @@
                 />
                 <a-popconfirm
                   placement="leftBottom"
-                  title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+                  :title="$t('l_Delete_survey_confirmation')"
                   :ok-text="$t('l_Yes')"
                   :cancel-text="$t('l_No')"
                   @confirm="onDelete(record.id)"
@@ -116,6 +129,13 @@
       :surveyId="editingSurveyId"
       @success="fetchSurveys"
     />
+
+    <!-- Модалка закрытия кейса -->
+    <CloseCaseModal
+      v-model:open="closeCaseModalVisible"
+      :patientId="props.id"
+      @success="onCaseClosed"
+    />
   </a-drawer>
 </template>
 
@@ -128,17 +148,16 @@ import { SurveysApi } from "../../api/survey";
 import { message } from "ant-design-vue";
 import { h } from "vue";
 import AddEditSurvey from "./AddEditSurvey.vue";
+import CloseCaseModal from "./CloseCaseModal.vue";
 import { useGlobal } from "../../composables/useGlobal"; // путь поправь
 
 const { t: $t } = useI18n();
 const { $formatIsoDate } = useGlobal();
 
-const props = defineProps<{
-  visible: boolean;
-  id: string | null;
-}>();
-
-const emit = defineEmits(["close"]);
+const props = defineProps({
+  visible: { type: Boolean, required: true },
+  id: { type: String, default: null }
+});const emit = defineEmits(["close"]);
 
 const data = ref<any>(null);
 // Responsive drawer width
@@ -168,6 +187,9 @@ const pagination = ref({
 const surveys = ref([]);
 const loadingSurveys = ref(false);
 const surveyModalVisible = ref(false);
+
+// ======== Закрытие кейса ========
+const closeCaseModalVisible = ref(false);
 const onDelete = async (id: string) => {
   try {
     await SurveysApi(`pregnant-women/${id}/`, {}, "DELETE");
@@ -206,7 +228,7 @@ const surveyColumns = [
 
   { title: $t("l_Actions"), key: "Action", width: 110, align: "center" },
 ];
-const editingSurveyId = ref<string | null>(null);
+const editingSurveyId = ref<string>();
 
 const onEdit = (record: any) => {
   editingSurveyId.value = record.id;
@@ -234,7 +256,18 @@ const fetchSurveys = async () => {
 };
 
 const onAddSurvey = () => {
+  editingSurveyId.value = undefined;
   surveyModalVisible.value = true;
+};
+
+const onCloseCase = () => {
+  closeCaseModalVisible.value = true;
+};
+
+const onCaseClosed = () => {
+  // Close the drawer after successful case closure
+  emit("close");
+  message.success($t("l_Case_closed_successfully"));
 };
 
 const handleTableChange = (pag: any) => {
@@ -244,29 +277,39 @@ const handleTableChange = (pag: any) => {
 };
 
 // ======== Загрузка данных беременной ========
-watch(
-  () => props.id,
-  async (newId) => {
-    if (props.visible && newId) {
-      data.value = null;
-      try {
-        const { data: res } = await PregnantApi(`${newId}/`, {}, "GET");
-        data.value = res;
-        fetchSurveys();
-      } catch {
-        message.error($t("l_Failed_to_load_pregnant_details"));
-      }
-    }
-  },
-  { immediate: true }
-);
+const loadPregnantData = async () => {
+  if (!props.visible || !props.id) return;
+  
+  data.value = null;
+  try {
+    const { data: res } = await PregnantApi(`${props.id}/`, {}, "GET");
+    data.value = res;
+    fetchSurveys();
+  } catch {
+    message.error($t("l_Failed_to_load_pregnant_details"));
+  }
+};
+
+// watch(
+//   () => props.id,
+//   async () => {
+//     if (props.visible && props.id) {
+//       await loadPregnantData();
+//     }
+//   }
+// );
 
 watch(
   () => props.visible,
-  (isVisible) => {
-    if (!isVisible) {
+  async (isVisible) => {
+    if (isVisible && props.id) {
+      // Загружаем данные при открытии компонента
+      await loadPregnantData();
+    } else if (!isVisible) {
+      // Очищаем данные при закрытии
       data.value = null;
       surveys.value = [];
+      pagination.value.current = 1;
     }
   }
 );

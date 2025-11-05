@@ -48,7 +48,8 @@
     </div>
     <!-- Кнопки / Карточки -->
     <a-row :gutter="16" class="mt-6">
-      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
+      <!-- Progressive Package - Available for both nurses and supervisors -->
+      <a-col v-if="canAccessPersonalData" :xs="24" :md="12" :xl="8" class="mb-4">
         <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
@@ -76,7 +77,8 @@
         </a-card>
       </a-col>
 
-      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
+      <!-- Universal Package - Available for both nurses and supervisors -->
+      <a-col v-if="canAccessPersonalData" :xs="24" :md="12" :xl="8" class="mb-4">
         <a-card :hoverable="true" :style="{ border: '1px solid #1677ff' }" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
@@ -104,7 +106,8 @@
         </a-card>
       </a-col>
 
-      <a-col :xs="24" :md="12" :xl="8" class="mb-4">
+      <!-- Nurse Diary - Available for both nurses and supervisors -->
+      <a-col v-if="canAccessPersonalData" :xs="24" :md="12" :xl="8" class="mb-4">
         <a-card :hoverable="true" :style="{ border: '1px solid #1677ff'}" style="min-height: 220px">
           <template #title>
             <div class="flex items-center gap-2">
@@ -132,25 +135,55 @@
           </a-space>
         </a-card>
       </a-col>
+
+      <!-- Supervisor-only reports section -->
+      <template v-if="canAccessSupervisorOnly">
+        <!-- Additional supervisor-only reports can be added here -->
+        <a-col :xs="24" class="mb-4">
+          <a-divider>
+            <span class="text-gray-500 text-sm">{{ $t('report_supervisor_only_section') || 'Supervisor Only Reports' }}</span>
+          </a-divider>
+        </a-col>
+      </template>
+
+      <!-- No access message -->
+      <a-col v-if="!canAccessPersonalData && !canAccessSupervisorOnly" :xs="24" class="mb-4">
+        <a-card>
+          <a-empty 
+            :description="$t('report_no_access_message') || 'You do not have permission to access reports'"
+          />
+        </a-card>
+      </a-col>
     </a-row>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { ReportsApi } from "../../api/reports";
 import { message } from "ant-design-vue";
 import dayjs from "dayjs";
 import { FileExcelOutlined } from "@ant-design/icons-vue";
+import { useUserStore } from "../../store/index";
+import { canAccessPersonalDataReports, canAccessSupervisorReports } from "../../types/roles";
 
+const userStore = useUserStore();
 const dateMode = ref<"month-year" | "range">("range");
-const dateRange = ref<[string, string] | null>(null);
+const dateRange = ref<[dayjs.Dayjs, dayjs.Dayjs] | null>([
+  dayjs().subtract(30, 'day'),
+  dayjs()
+]);
 const month = ref<number | null>(null);
 const year = ref<number | null>(dayjs().year());
 const downloading = ref<string | null>(null);
 
+// Role-based access control
+const userRole = computed(() => userStore.user?.user_role || '');
+const canAccessPersonalData = computed(() => canAccessPersonalDataReports(userRole.value));
+const canAccessSupervisorOnly = computed(() => canAccessSupervisorReports(userRole.value));
+
 const disabledFutureDate = (current: any) =>
-  current && current > dayjs().endOf("day");
+  current && dayjs(current).isValid() && dayjs(current).isAfter(dayjs().endOf("day"));
 
 async function downloadReport(type: string) {
   try {
@@ -161,6 +194,7 @@ async function downloadReport(type: string) {
     if (dateMode.value === "month-year") {
       if (!month.value || !year.value) {
         message.warning("Выберите месяц и год");
+        downloading.value = null;
         return;
       }
       params.month = month.value;
@@ -169,6 +203,7 @@ async function downloadReport(type: string) {
     } else if (dateMode.value === "range") {
       if (!dateRange.value) {
         message.warning("Выберите диапазон дат");
+        downloading.value = null;
         return;
       }
       const start = dayjs(dateRange.value[0]).format("YYYY-MM-DD");
@@ -194,8 +229,9 @@ async function downloadReport(type: string) {
     link.remove();
     window.URL.revokeObjectURL(url);
     message.success("Отчёт успешно скачан");
-  } catch (e) {
-    message.error("Ошибка при скачивании отчёта");
+  } catch (e: any) {
+    console.error("Download error:", e);
+    message.error(e?.response?.data?.message || "Ошибка при скачивании отчёта");
   } finally {
     downloading.value = null;
   }

@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
+// import tailwindcss from 'tailwindcss'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
@@ -30,7 +30,7 @@ export default defineConfig(() => {
   const stackEnv = loadStackEnv()
   
   return {
-    plugins: [tailwindcss(), vue()],
+    plugins: [vue()],
     server: {
       host: true,
       allowedHosts: [

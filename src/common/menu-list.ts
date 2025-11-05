@@ -41,5 +41,12 @@ export function getMenuList(): MenuItem[] {
       expand: false,
       children: [],
     },
+    {
+      name: $t("l_Closed_cases"),
+      icon: "chat_error",
+      routerPath: "/closed-cases",
+      expand: false,
+      children: [],
+    },
   ]
 }

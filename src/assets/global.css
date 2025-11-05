@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @font-face {
   font-family: "Exo 2";
   src: url("./style/fonts/Exo2.ttf");
@@ -22,7 +24,18 @@ html * {
   align-items: center;
   justify-content: center;
 }
-
+.ant-table-row:hover {
+  background-color: #efeff0 !important;
+}
+.ant-table-cell{
+  border: 1px solid white !important;
+}
+.ant-table-cell-row-hover {
+  background-color: #e7ecf0 !important;
+}
+.ant-modal-title {
+  background-color: #f3f6f8 !important;
+}
 .search-input :deep(.ant-input-search-button .anticon) {
   display: flex;
   align-items: center;

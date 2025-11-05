@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
@@ -28,8 +27,6 @@ build:
     - main
     - dev
 
-
-
 deploy-dev:
   stage: deploy
   tags:
@@ -45,4 +42,3 @@ deploy-dev:
     - curl --fail --max-time 30 -X POST "${PORTAINER_WEBHOOK}/${PORTAINER_TOKEN}"
   only:
     - dev
-

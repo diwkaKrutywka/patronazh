@@ -5,10 +5,11 @@
     :confirm-loading="loading"
     :footer="null"
     destroyOnClose
+    @cancel="handleCancel"
   >
     <a-form layout="vertical" :model="form" :rules="rules" ref="formRef">
       <a-form-item :label="$t('l_IIN')" name="iin">
-        <a-input v-model:value="form.iin" />
+        <a-input v-model:value="form.iin" maxlength="12" />
       </a-form-item>
 
       <a-form-item :label="$t('l_Full_name')" name="full_name">
@@ -21,6 +22,7 @@
           v-model:value="form.birth_date"
           format="YYYY-MM-DD"
           valueFormat="YYYY-MM-DD"
+          :disabled-date="disabledDate"
         />
       </a-form-item>
 
@@ -33,6 +35,10 @@
 
       <a-form-item :label="$t('l_Address')" name="address">
         <a-input v-model:value="form.address" />
+      </a-form-item>
+
+      <a-form-item :label="$t('l_Phone_number')" name="phone_number">
+        <a-input v-model:value="form.phone_number" @input="handlePhoneInput" />
       </a-form-item>
       <div class="flex justify-end gap-2 mt-4">
         <a-button type="primary" @click="handleSubmit">{{
@@ -48,6 +54,8 @@ import { ref, watch, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { message } from "ant-design-vue";
 import { KidsApi } from "../../api/kids";
+import { formatPhoneNumber } from "../../utils/phone";
+import dayjs from "dayjs";
 
 interface KidForm {
   iin: string;
@@ -55,6 +63,7 @@ interface KidForm {
   birth_date: string;
   gender: string;
   address: string;
+  phone_number: string;
 }
 
 const props = defineProps<{
@@ -80,14 +89,24 @@ const form = reactive<KidForm>({
   birth_date: "",
   gender: "MALE",
   address: "",
+  phone_number: formatPhoneNumber("+7"),
 });
 
 const rules = {
-  iin: [{ required: true, message: $t("l_Required_field") }],
+  iin: [
+    { required: true, message: $t("l_Required_field") },
+    { len: 12, message: $t("l_IIN_length_error") },
+  ],
   full_name: [{ required: true, message: $t("l_Required_field") }],
   birth_date: [{ required: true, message: $t("l_Required_field") }],
   gender: [{ required: true, message: $t("l_Required_field") }],
   address: [{ required: true, message: $t("l_Required_field") }],
+  phone_number: [{ required: true, message: $t("l_Required_field") }],
+};
+
+const disabledDate = (current: any) => {
+  // Блокируем будущие даты
+  return current && current > dayjs().endOf("day");
 };
 
 // Следим за открытием
@@ -102,6 +121,9 @@ watch(
       } else {
         resetForm();
       }
+    } else {
+      // Сбрасываем форму при закрытии
+      resetForm();
     }
   }
 );
@@ -109,8 +131,12 @@ watch(
 const fetchKid = async (id: string) => {
   try {
     loading.value = true;
-    const { data } = await KidsApi<KidForm>(id, {}, "GET");
+    const { data } = await KidsApi<KidForm>(`${id}/`, {}, "GET");
     Object.assign(form, data);
+    // Форматируем номер телефона после загрузки
+    if (form.phone_number) {
+      form.phone_number = formatPhoneNumber(form.phone_number);
+    }
   } catch (err) {
     message.error($t("l_Load_error"));
   } finally {
@@ -147,5 +173,17 @@ const resetForm = () => {
   form.birth_date = "";
   form.gender = "MALE";
   form.address = "";
+  form.phone_number = formatPhoneNumber("+7");
+};
+
+const handlePhoneInput = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const formatted = formatPhoneNumber(target.value);
+  form.phone_number = formatted;
+};
+
+const handleCancel = () => {
+  visible.value = false;
+  emit("update:open", false);
 };
 </script>

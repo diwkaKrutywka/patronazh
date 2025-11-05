@@ -112,6 +112,22 @@
                     :getPopupContainer="getPopupContainer"
                   />
                 </div>
+                <div>
+                  <a-select
+                    v-model:value="currentFilters.visit_status_color"
+                    mode="multiple"
+                    :placeholder="$t('l_Visit_status_color')"
+                    allowClear
+                    class="w-full"
+                    size="small"
+                    :getPopupContainer="getPopupContainer"
+                  >
+                    <a-select-option value="RED">{{ $t('l_RED') }}</a-select-option>
+                    <a-select-option value="YELLOW">{{ $t('l_YELLOW') }}</a-select-option>
+                    <a-select-option value="PURPLE">{{ $t('l_PURPLE') }}</a-select-option>
+                    <a-select-option value="GREEN">{{ $t('l_GREEN') }}</a-select-option>
+                  </a-select>
+                </div>
                 <div class="sm:col-span-2">
                   <a-range-picker
                     v-model:value="currentFilters.survey_date_range"
@@ -189,6 +205,29 @@ upload
       </template>
     </a-page-header>
 
+    <!-- Легенда статусов визитов -->
+    <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+      <h4 class="text-sm font-semibold mb-2">{{ $t("l_Visit_status_legend") }}</h4>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded" style="background-color: rgb(255, 234, 236); border: 1px solid #ff4d4f;"></div>
+          <span><strong>{{ $t("l_RED") }}</strong> - {{ $t("l_RED_description") }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded" style="background-color: rgb(255, 251, 230); border: 1px solid #faad14;"></div>
+          <span><strong>{{ $t("l_YELLOW") }}</strong> - {{ $t("l_YELLOW_description") }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded" style="background-color: rgb(243, 240, 255); border: 1px solid #722ed1;"></div>
+          <span><strong>{{ $t("l_PURPLE") }}</strong> - {{ $t("l_PURPLE_description") }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded" style="background-color: rgb(246, 255, 237); border: 1px solid #52c41a;"></div>
+          <span><strong>{{ $t("l_GREEN") }}</strong> - {{ $t("l_GREEN_description") }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Таблица -->
     <a-table
       bordered
@@ -197,28 +236,32 @@ upload
       :pagination="pagination"
       rowKey="id"
       :loading="loading"
-      :scroll="{ x: 'max-content' }"
+      :scroll="{ x: 1200 }"
+      :customRow="customRow"
+      size="small"
       @change="handleTableChange"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'Action'">
-          <a-space>
+          <a-space size="small">
             <img
-              class="w-[25px] mr-4 cursor-pointer hover:opacity-70"
+              class="w-[18px] cursor-pointer hover:opacity-70"
               src="../../assets/edit.png"
               @click="onEdit(record)"
+              :title="$t('l_Edit')"
             />
 
             <a-popconfirm
               placement="leftBottom"
-              title="Сіз расымен қолданушыны қайта қосқыңыз келеді ме?"
+              :title="$t('l_Delete_confirmation')"
               :ok-text="$t('l_Yes')"
               :cancel-text="$t('l_No')"
               @confirm="onDelete(record.id)"
             >
               <img
-                class="w-[25px] cursor-pointer hover:opacity-70"
+                class="w-[18px] cursor-pointer hover:opacity-70"
                 src="../../assets/delete.png"
+                :title="$t('l_Delete')"
               />
             </a-popconfirm>
           </a-space>
@@ -237,7 +280,7 @@ upload
     <kid-details
       :visible="detailsVisible"
       :id="selectedKid"
-      @close="detailsVisible = false"
+      @close="detailsVisible = false; fetchKids()"
     />
   </div>
 </template>
@@ -262,9 +305,14 @@ type Kid = {
   gender: string;
   address: string;
   organization: string;
+  phone_number: string;
   age_months: number;
   created_at: string;
   updated_at: string;
+  visit_status?: {
+    color: string;
+    description: string;
+  };
 };
 
 const search = ref("");
@@ -276,7 +324,7 @@ const modalVisible = ref(false);
 const editingKid = ref<Kid | null>(null);
 
 const detailsVisible = ref(false);
-const selectedKid = ref<string | null>(null);
+const selectedKid = ref<string>();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const filtersOpen = ref(false);
@@ -318,7 +366,7 @@ const columns = [
   {
     title: "#",
     key: "index",
-    width: "50px",
+    width: 40,
     responsive: ["sm"],
     customRender: ({ index }: { index: number }) =>
       (pagination.value.current - 1) * pagination.value.pageSize + index + 1,
@@ -326,6 +374,8 @@ const columns = [
   {
     title: $t("l_Full_name"),
     dataIndex: "full_name",
+    width: 200,
+    ellipsis: true,
     customRender: ({ text, record }: TableRenderProps<Kid>) => {
       const initials = (text as string)
         .split(" ")
@@ -333,7 +383,7 @@ const columns = [
         .slice(0, 2)
         .join("")
         .toUpperCase();
-      return h("div", { class: "flex items-center gap-2" }, [
+      return h("div", { class: "flex items-center gap-1" }, [
         h(
           Avatar,
           {
@@ -348,8 +398,9 @@ const columns = [
         h(
           "span",
           {
-            class: "cursor-pointer hover:text-blue-600 underline transition",
+            class: "cursor-pointer hover:text-blue-600 underline transition truncate",
             onClick: () => onOpenDetails(record.id),
+            title: text,
           },
           text
         ),
@@ -357,13 +408,26 @@ const columns = [
     },
   },
   {
+    title: $t("l_Has_risk"),
+    dataIndex: "is_in_progressive_package",
+    width: 60,
+    responsive: ["sm"],
+    ellipsis: true,
+    customRender: ({ text }: TableRenderProps<Kid>) => {
+      return h(Tag, { color: text ? "red" : "gray" }, () => text ? $t("l_Yes") : $t("l_No"));
+    },
+  },
+  {
     title: $t("l_IIN"),
     dataIndex: "iin",
+    width: 120,
     responsive: ["sm"],
+    ellipsis: true,
   },
   {
     title: $t("l_Birth_date"),
     dataIndex: "birth_date",
+    width: 100,
     responsive: ["sm"],
     customRender: ({ text }: TableRenderProps<Kid>) => {
       const { $formatIsoDate } = useGlobal();
@@ -373,6 +437,7 @@ const columns = [
   {
     title: $t("l_Gender"),
     dataIndex: "gender",
+    width: 80,
     responsive: ["md"],
     customRender: ({ text }: TableRenderProps<Kid>) => {
       const genderLower = String(text).toLowerCase();
@@ -386,25 +451,65 @@ const columns = [
   {
     title: $t("l_Address"),
     dataIndex: "address",
+    width: 150,
     responsive: ["lg"],
     ellipsis: true,
   },
   {
-    title: $t("l_Organization"),
-    dataIndex: "organization_name",
-    responsive: ["md"],
+    title: $t("l_Phone_number"),
+    dataIndex: "phone_number",
+    width: 120,
+    responsive: ["sm"],
     ellipsis: true,
+    customRender: ({ text }: TableRenderProps<Kid>) => {
+      return h(Tag, { color: "blue" }, () => text || "-");
+    },
   },
   {
     title: $t("l_Age_months"),
     dataIndex: "age_months",
+    width: 80,
     responsive: ["md"],
+  },
+  {
+    title: $t("l_Last_survey_date"),
+    dataIndex: "last_survey_date",
+    width: 100,
+    responsive: ["md"],
+    ellipsis: false,
+    customRender: ({ text }: TableRenderProps<Kid>) => {
+      if (text) {
+        return h(Tag, { color: "green" }, () => text);
+      }
+      return "";
+    },
+  },
+  {
+    title: $t("l_Scheduled_next_visit_date"),
+    dataIndex: "planned_next_visit_date",
+    width: 100,
+    responsive: ["md"],
+    ellipsis: false,
+    customRender: ({ text }: TableRenderProps<Kid>) => {
+      if (text) {
+        return h(Tag, { color: "green" }, () => text);
+      }
+      return "";
+    },
+  },
+  {
+    title: $t("l_Organization"),
+    dataIndex: "organization_name",
+    width: 120,
+    responsive: ["md"],
+    ellipsis: true,
   },
   {
     title: $t("l_Actions"),
     key: "Action",
-    width: 110,
+    width: 100,
     align: "center",
+    fixed: "right",
   },
 ];
 
@@ -501,6 +606,9 @@ const fetchKids = async () => {
       if (has_surveys !== undefined && has_surveys !== null && has_surveys !== '') {
         queryParams.has_surveys = String(has_surveys) === 'true';
       }
+      if (Array.isArray(currentFilters.value.visit_status_color) && currentFilters.value.visit_status_color.length > 0) {
+        queryParams.visit_status_color = currentFilters.value.visit_status_color;
+      }
       if (no_surveys_range && Array.isArray(no_surveys_range) && no_surveys_range.length === 2) {
         queryParams.no_surveys_from = String(no_surveys_range[0]);
         queryParams.no_surveys_to = String(no_surveys_range[1]);
@@ -525,7 +633,7 @@ const fetchKids = async () => {
     tableData.value = data.items;
     pagination.value.total = data.total;
   } catch (error) {
-    message.error("Не удалось загрузить список детей");
+    message.error($t("l_Failed_to_load_kids_list"));
     console.error(error);
   } finally {
     loading.value = false;
@@ -558,6 +666,46 @@ const resetFilters = () => {
 
 const getPopupContainer = (triggerNode: HTMLElement) =>
   triggerNode?.parentElement || document.body;
+
+const customRow = (record: Kid) => {
+  const getRowStyle = () => {
+    if (!record.visit_status?.color) return {};
+    
+    switch (record.visit_status.color) {
+      case "RED":
+        return { 
+          backgroundColor: "#ffe0e0", 
+          border: "5px solid white",
+          '--hover-bg': '#ffb3b3'
+        };
+      case "YELLOW":
+        return { 
+          backgroundColor: "rgb(255, 251, 230)", 
+          border: "5px solid white",
+          '--hover-bg': '#fff2b3'
+        };
+      case "PURPLE":
+        return { 
+          backgroundColor: "rgb(243, 240, 255)", 
+          border: "5px solid white",
+          '--hover-bg': '#d9b3ff'
+        };
+      case "GREEN":
+        return { 
+          backgroundColor: "#e8ffe0", 
+          border: "5px solid white",
+          '--hover-bg': '#b3ffb3'
+        };
+      default:
+        return {};
+    }
+  };
+  
+  return {
+    style: getRowStyle(),
+    class: `custom-table-row custom-${record.visit_status?.color?.toLowerCase() || 'default'}`
+  };
+};
 
 onMounted(fetchKids);
 
@@ -594,5 +742,227 @@ watch(search, (newValue) => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Уменьшаем размеры шрифтов в таблице */
+:deep(.ant-table) {
+  font-size: 12px;
+}
+
+:deep(.ant-table-thead > tr > th) {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 4px;
+  line-height: 1.2;
+}
+
+:deep(.ant-table-tbody > tr > td) {
+  font-size: 11px;
+  padding: 6px 4px;
+  line-height: 1.3;
+}
+
+/* Уменьшаем размеры аватаров */
+:deep(.ant-avatar) {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 10px !important;
+  line-height: 24px !important;
+}
+
+/* Уменьшаем размеры тегов */
+:deep(.ant-tag) {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Оптимизируем ширину колонок */
+:deep(.ant-table-tbody > tr > td:nth-child(1)) {
+  width: 40px;
+  min-width: 40px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(2)) {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(3)) {
+  width: 120px;
+  min-width: 120px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(4)) {
+  width: 100px;
+  min-width: 100px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(5)) {
+  width: 80px;
+  min-width: 80px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(6)) {
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(7)) {
+  width: 120px;
+  min-width: 120px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(8)) {
+  width: 80px;
+  min-width: 80px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(9)) {
+  width: 100px;
+  min-width: 100px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(10)) {
+  width: 100px;
+  min-width: 100px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(11)) {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(12)) {
+  width: 100px;
+  min-width: 100px;
+}
+
+/* Улучшаем мобильную адаптивность */
+@media (max-width: 768px) {
+  :deep(.ant-table) {
+    font-size: 10px;
+  }
+  
+  :deep(.ant-table-thead > tr > th) {
+    font-size: 9px;
+    padding: 4px 2px;
+  }
+  
+  :deep(.ant-table-tbody > tr > td) {
+    font-size: 9px;
+    padding: 4px 2px;
+  }
+  
+  :deep(.ant-avatar) {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 8px !important;
+    line-height: 20px !important;
+  }
+  
+  :deep(.ant-tag) {
+    font-size: 8px;
+    padding: 1px 4px;
+  }
+}
+
+/* Уменьшаем размеры иконок действий */
+:deep(.ant-table-tbody > tr > td img) {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+@media (max-width: 768px) {
+  :deep(.ant-table-tbody > tr > td img) {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+/* Исправляем hover эффекты для цветных строк */
+:deep(.ant-table-tbody > tr.custom-table-row:hover > td) {
+  background: var(--hover-bg) !important;
+}
+
+/* Принудительно сохраняем цвета строк после hover */
+:deep(.ant-table-tbody > tr.custom-table-row > td) {
+  background: inherit !important;
+}
+
+/* Убираем стандартный hover эффект Ant Design для цветных строк */
+:deep(.ant-table-tbody > tr.custom-table-row:hover) {
+  background: transparent !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-table-row:hover > td) {
+  background: var(--hover-bg) !important;
+}
+
+/* Увеличиваем ширину колонок для лучшего отображения названий */
+:deep(.ant-table-thead > tr > th:nth-child(9)) {
+  width: 140px !important;
+  min-width: 140px !important;
+}
+
+:deep(.ant-table-thead > tr > th:nth-child(10)) {
+  width: 140px !important;
+  min-width: 140px !important;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(9)) {
+  width: 140px !important;
+  min-width: 140px !important;
+}
+
+:deep(.ant-table-tbody > tr > td:nth-child(10)) {
+  width: 140px !important;
+  min-width: 140px !important;
+}
+
+/* Разрешаем перенос текста в заголовках колонок */
+:deep(.ant-table-thead > tr > th) {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  line-height: 1.2 !important;
+  padding: 8px 4px !important;
+}
+
+/* Принудительно сохраняем цвета для каждого типа строк */
+:deep(.ant-table-tbody > tr.custom-red > td) {
+  background-color: #ffe0e0 !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-yellow > td) {
+  background-color: rgb(255, 251, 230) !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-purple > td) {
+  background-color: rgb(243, 240, 255) !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-green > td) {
+  background-color: #e8ffe0 !important;
+}
+
+/* Hover эффекты для каждого типа */
+:deep(.ant-table-tbody > tr.custom-red:hover > td) {
+  background-color: #ffb3b3 !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-yellow:hover > td) {
+  background-color: #fff2b3 !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-purple:hover > td) {
+  background-color: #d9b3ff !important;
+}
+
+:deep(.ant-table-tbody > tr.custom-green:hover > td) {
+  background-color: #b3ffb3 !important;
 }
 </style>
