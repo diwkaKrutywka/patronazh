@@ -4,12 +4,13 @@
  * @returns отформатированный номер телефона
  */
 export const formatPhoneNumber = (value: string): string => {
-  if (!value) return value;
+  if (!value) return '+7';
 
   // 1) Удалить ВСЁ кроме цифр
   const digits = value.replace(/\D/g, '');
 
-  if (digits.length === 0) {
+  // Если нет цифр или только одна цифра "7", всегда возвращаем "+7"
+  if (digits.length === 0 || (digits.length === 1 && digits === '7')) {
     return '+7';
   }
 
@@ -32,7 +33,8 @@ export const formatPhoneNumber = (value: string): string => {
 
   // 5) Применить форматирование
   // Теперь phoneDigits всегда начинается с 7 и содержит максимум 11 цифр
-  if (phoneDigits.length <= 1) {
+  // Всегда сохраняем минимум "+7"
+  if (phoneDigits.length <= 1 || phoneDigits === '7') {
     return '+7';
   }
 

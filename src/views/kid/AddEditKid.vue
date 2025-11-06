@@ -38,7 +38,12 @@
       </a-form-item>
 
       <a-form-item :label="$t('l_Phone_number')" name="phone_number">
-        <a-input v-model:value="form.phone_number" @input="handlePhoneInput" />
+        <a-input 
+          v-model:value="form.phone_number" 
+          @input="handlePhoneInput"
+          @keydown="handlePhoneKeydown"
+          @paste="handlePhonePaste"
+        />
       </a-form-item>
       <div class="flex justify-end gap-2 mt-4">
         <a-button type="primary" @click="handleSubmit">{{
@@ -192,8 +197,103 @@ const resetForm = () => {
 
 const handlePhoneInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
-  const formatted = formatPhoneNumber(target.value);
-  form.phone_number = formatted;
+  let value = target.value;
+  
+  // Гарантируем, что значение всегда начинается с "+7"
+  if (!value.startsWith('+7')) {
+    // Если пользователь удалил "+7", восстанавливаем его
+    const digits = value.replace(/\D/g, '');
+    if (digits.length > 0) {
+      value = '+7' + digits;
+    } else {
+      value = '+7';
+    }
+  }
+  
+  const formatted = formatPhoneNumber(value);
+  form.phone_number = formatted || '+7';
+  
+  // Сохраняем позицию курсора
+  const cursorPos = target.selectionStart || 0;
+  // Если курсор был в начале и мы восстановили "+7", устанавливаем курсор после "+7"
+  if (cursorPos <= 2 && formatted.startsWith('+7')) {
+    setTimeout(() => {
+      target.setSelectionRange(Math.min(2, formatted.length), Math.min(2, formatted.length));
+    }, 0);
+  }
+};
+
+const handlePhoneKeydown = (e: KeyboardEvent) => {
+  const target = e.target as HTMLInputElement;
+  const cursorPos = target.selectionStart || 0;
+  const selectionEnd = target.selectionEnd || 0;
+  const value = target.value;
+  
+  // Блокируем удаление, если курсор находится в позиции, где можно удалить "+7"
+  if (e.key === 'Backspace' && cursorPos <= 2) {
+    // Если курсор на позиции 0, 1 или 2 (внутри или перед "+7"), блокируем удаление
+    e.preventDefault();
+    // Устанавливаем курсор после "+7"
+    setTimeout(() => {
+      target.setSelectionRange(2, 2);
+    }, 0);
+    return;
+  }
+  
+  if (e.key === 'Delete' && cursorPos < 2) {
+    // Если курсор перед "+7", блокируем удаление
+    e.preventDefault();
+    setTimeout(() => {
+      target.setSelectionRange(2, 2);
+    }, 0);
+    return;
+  }
+  
+  // Блокируем удаление, если выделен текст, который включает "+7"
+  if ((e.key === 'Backspace' || e.key === 'Delete') && cursorPos === 0 && selectionEnd > 0) {
+    // Если выделение начинается с начала и включает "+7"
+    if (selectionEnd >= 2) {
+      e.preventDefault();
+      // Оставляем "+7" и удаляем только остальное
+      const remaining = value.slice(selectionEnd);
+      form.phone_number = '+7' + remaining.replace(/\D/g, '');
+      setTimeout(() => {
+        target.setSelectionRange(2, 2);
+      }, 0);
+      return;
+    }
+  }
+};
+
+const handlePhonePaste = (e: ClipboardEvent) => {
+  e.preventDefault();
+  const target = e.target as HTMLInputElement;
+  const pastedText = (e.clipboardData?.getData('text') || '').replace(/\D/g, '');
+  const cursorPos = target.selectionStart || 0;
+  const selectionEnd = target.selectionEnd || 0;
+  const currentValue = target.value;
+  
+  // Если вставка происходит в начале (включая "+7"), заменяем только часть после "+7"
+  if (cursorPos <= 2) {
+    const newValue = '+7' + pastedText;
+    form.phone_number = formatPhoneNumber(newValue);
+    setTimeout(() => {
+      const formatted = form.phone_number;
+      const newCursorPos = Math.min(formatted.length, 2 + pastedText.length);
+      target.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  } else {
+    // Вставка после "+7"
+    const before = currentValue.slice(0, cursorPos);
+    const after = currentValue.slice(selectionEnd);
+    const newValue = before + pastedText + after;
+    form.phone_number = formatPhoneNumber(newValue);
+    setTimeout(() => {
+      const formatted = form.phone_number;
+      const newCursorPos = Math.min(formatted.length, cursorPos + pastedText.length);
+      target.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  }
 };
 
 const handleCancel = () => {
