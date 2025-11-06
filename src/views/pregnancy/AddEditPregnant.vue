@@ -206,29 +206,52 @@ const handlePhoneKeydown = (e: KeyboardEvent) => {
 const handlePhonePaste = (e: ClipboardEvent) => {
   e.preventDefault();
   const target = e.target as HTMLInputElement;
-  const pastedText = (e.clipboardData?.getData('text') || '').replace(/\D/g, '');
+  const pastedText = e.clipboardData?.getData('text') || '';
   const cursorPos = target.selectionStart || 0;
   const selectionEnd = target.selectionEnd || 0;
   const currentValue = target.value;
   
-  // Если вставка происходит в начале (включая "+7"), заменяем только часть после "+7"
+  // Если вставка происходит в начале (включая "+7"), заменяем весь номер
   if (cursorPos <= 2) {
-    const newValue = '+7' + pastedText;
-    form.value.phone_number = formatPhoneNumber(newValue);
+    let processedText = pastedText.trim();
+    
+    // Если вставленный текст начинается с "+7", обрабатываем специально
+    if (processedText.startsWith('+7')) {
+      // Убираем "+7" и берем только цифры после
+      const digits = processedText.replace(/\D/g, '');
+      // digits теперь содержит все цифры, включая первую "7" после "+"
+      // Например: "+77784017751" → digits = "77784017751" (11 цифр)
+      // Нужно оставить как есть, formatPhoneNumber сам обработает
+      processedText = digits;
+    } else {
+      // Для других форматов используем обычную обработку
+      processedText = processedText;
+    }
+    
+    // Форматируем номер
+    const newValue = formatPhoneNumber(processedText);
+    form.value.phone_number = newValue;
     setTimeout(() => {
       const formatted = form.value.phone_number;
-      const newCursorPos = Math.min(formatted.length, 2 + pastedText.length);
-      target.setSelectionRange(newCursorPos, newCursorPos);
+      // Устанавливаем курсор в конец отформатированного номера
+      target.setSelectionRange(formatted.length, formatted.length);
     }, 0);
   } else {
-    // Вставка после "+7"
+    // Вставка после "+7" - берем только цифры и добавляем их
+    const digits = pastedText.replace(/\D/g, '');
+    // Если вставленный текст начинается с 8 или 7, убираем первую цифру (она уже есть в "+7")
+    let digitsToAdd = digits;
+    if (digits.startsWith('8') || digits.startsWith('7')) {
+      digitsToAdd = digits.slice(1);
+    }
+    
     const before = currentValue.slice(0, cursorPos);
     const after = currentValue.slice(selectionEnd);
-    const newValue = before + pastedText + after;
+    const newValue = before + digitsToAdd + after;
     form.value.phone_number = formatPhoneNumber(newValue);
     setTimeout(() => {
       const formatted = form.value.phone_number;
-      const newCursorPos = Math.min(formatted.length, cursorPos + pastedText.length);
+      const newCursorPos = Math.min(formatted.length, cursorPos + digitsToAdd.length);
       target.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
   }
