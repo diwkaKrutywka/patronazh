@@ -27,6 +27,8 @@
             format="YYYY-MM-DD" 
             style="width: 100%"
             :disabled-date="disabledBirthDate"
+            :default-picker-value="maxBirthDate"
+            class="birth-date-picker"
           />
         </a-form-item>
   
@@ -65,7 +67,7 @@
   import { useI18n } from "vue-i18n";
   import { PregnantApi } from "../../api/pregnancy";
   import dayjs from "dayjs";
-  import { formatPhoneNumber, validatePhoneNumber } from "../../utils/phone";
+  import { formatPhoneNumber, validatePhoneNumber, unformatPhoneNumber } from "../../utils/phone";
   
   const props = defineProps<{
     id?: string | null;
@@ -132,13 +134,13 @@
     form.value.phone_number = formatted;
   };
 
+  // Максимально доступная дата рождения (31 декабря текущий год - 12 лет)
+  const maxBirthDate = dayjs().subtract(12, 'year').endOf('year');
+
   const disabledBirthDate = (current: any) => {
     if (!current) return false;
     
     const today = dayjs();
-    // Минимальный год рождения = текущий год - 12 лет
-    // Блокируем даты после 31 декабря (текущий год - 12 лет)
-    const maxBirthDate = today.subtract(12, 'year').endOf('year');
     
     // Блокируем будущие даты и даты после максимальной допустимой даты рождения
     return current > today.endOf("day") || current > maxBirthDate;
@@ -193,6 +195,7 @@
         const payload: any = {
           ...form.value,
           birth_date: form.value.birth_date ? dayjs(form.value.birth_date).format("YYYY-MM-DD") : null,
+          phone_number: unformatPhoneNumber(form.value.phone_number),
         };
         
         // Only include pregnancy_start_date if it has a value
@@ -236,4 +239,23 @@
     }
   );
   </script>
+  
+  <style scoped>
+  /* Скрываем кнопки навигации по годам/десятилетиям */
+  :deep(.birth-date-picker .ant-picker-header-super-prev-btn),
+  :deep(.birth-date-picker .ant-picker-header-super-next-btn) {
+    display: none !important;
+  }
+  
+  /* Блокируем клик на заголовок (год/месяц) чтобы нельзя было перейти на уровень выбора года */
+  :deep(.birth-date-picker .ant-picker-header-view) {
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+  }
+  
+  :deep(.birth-date-picker .ant-picker-header-view:hover) {
+    color: inherit;
+  }
+  </style>
   

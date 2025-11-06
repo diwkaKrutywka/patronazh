@@ -54,7 +54,7 @@ import { ref, watch, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import { message } from "ant-design-vue";
 import { KidsApi } from "../../api/kids";
-import { formatPhoneNumber, validatePhoneNumber } from "../../utils/phone";
+import { formatPhoneNumber, validatePhoneNumber, unformatPhoneNumber } from "../../utils/phone";
 import dayjs from "dayjs";
 
 interface KidForm {
@@ -158,11 +158,15 @@ const handleSubmit = () => {
   formRef.value?.validate().then(async () => {
     try {
       loading.value = true;
+      const payload = {
+        ...form,
+        phone_number: unformatPhoneNumber(form.phone_number),
+      };
       if (isEdit.value && props.id) {
-        await KidsApi(`${props.id}/`, form, "PUT");
+        await KidsApi(`${props.id}/`, payload, "PUT");
         message.success($t("l_Updated_successfully"));
       } else {
-        await KidsApi("", form, "POST");
+        await KidsApi("", payload, "POST");
         message.success($t("l_Created_successfully"));
       }
       emit("submit");
