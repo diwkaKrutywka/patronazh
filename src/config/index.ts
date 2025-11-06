@@ -21,8 +21,8 @@ function getBaseUrl(): string {
 
   // For localhost
   if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    const port = currentPort || (currentProtocol === 'https:' ? '443' : '80');
-    return `${currentProtocol}//${currentHost}:${port}/api`;
+   //const port = currentPort || (currentProtocol === 'https:' ? '443' : '80');
+    return `https://rapidly-magnetic-seahorse.ngrok-free.app/api/v1`;
   }
 
   // Default: use current domain

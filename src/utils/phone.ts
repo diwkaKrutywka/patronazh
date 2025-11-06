@@ -6,71 +6,60 @@
 export const formatPhoneNumber = (value: string): string => {
   if (!value) return value;
 
-  // Удаляем все символы кроме цифр и +
-  const cleaned = value.replace(/[^\d+]/g, '');
+  // 1) Удалить ВСЁ кроме цифр
+  const digits = value.replace(/\D/g, '');
 
-  // Если начинается с +7, сохраняем это
-  let phone = cleaned;
-  let hasPlus = phone.startsWith('+7');
-  
-  if (hasPlus) {
-    phone = phone.replace('+7', '');
-  }
-
-  // Оставляем только цифры
-  const digits = phone.replace(/\D/g, '');
-
-  // Форматируем в зависимости от количества цифр
   if (digits.length === 0) {
-    return hasPlus ? '+7' : '';
+    return '+7';
   }
 
-  // Гарантируем, что код начинается с 7
-  let formattedDigits = digits;
-  if (hasPlus) {
-    // Если уже есть +7, код должен начинаться с 7
-    if (formattedDigits.length > 0 && formattedDigits[0] !== '7') {
-      formattedDigits = '7' + formattedDigits;
-    }
-  } else {
-    // Если нет +7, добавляем его и начинаем с 7
-    formattedDigits = '7' + formattedDigits;
+  let phoneDigits = digits;
+
+  // 2) Если начинается с 8 → заменить на +7 (заменяем 8 на 7)
+  if (phoneDigits.startsWith('8')) {
+    phoneDigits = '7' + phoneDigits.slice(1);
+  }
+  // 3) Если начинается с 7 → добавить + (уже начинается с 7, просто оставляем)
+  // Если не начинается с 7 или 8, добавляем 7 в начало
+  if (!phoneDigits.startsWith('7') && !phoneDigits.startsWith('8')) {
+    phoneDigits = '7' + phoneDigits;
   }
 
-  if (formattedDigits.length <= 1) {
-    return `+7 (${formattedDigits}`;
+  // 4) Обрезать до 11 цифр (включая первую 7)
+  if (phoneDigits.length > 11) {
+    phoneDigits = phoneDigits.slice(0, 11);
   }
 
-  if (formattedDigits.length <= 3) {
-    return `+7 (${formattedDigits}`;
+  // 5) Применить форматирование
+  // Теперь phoneDigits всегда начинается с 7 и содержит максимум 11 цифр
+  if (phoneDigits.length <= 1) {
+    return '+7';
   }
 
-  if (formattedDigits.length <= 6) {
-    const code = formattedDigits.slice(0, 3);
-    const first = formattedDigits.slice(3);
-    return `+7 (${code})${first}`;
+  const code = phoneDigits.slice(1, 4); // Берем 3 цифры после 7
+  const remaining = phoneDigits.slice(4); // Остальные цифры после кода
+
+  if (phoneDigits.length <= 4) {
+    // Если есть только код оператора (1-3 цифры после 7)
+    return `+7 (${code}`;
   }
 
-  if (formattedDigits.length <= 8) {
-    const code = formattedDigits.slice(0, 3);
-    const first = formattedDigits.slice(3, 6);
-    const second = formattedDigits.slice(6);
+  if (phoneDigits.length <= 7) {
+    // Если есть код и начало номера (до 3 цифр после кода)
+    return `+7 (${code})${remaining}`;
+  }
+
+  if (phoneDigits.length <= 9) {
+    // Если есть код, первая часть и начало второй части
+    const first = remaining.slice(0, 3);
+    const second = remaining.slice(3);
     return `+7 (${code})${first}-${second}`;
   }
 
-  if (formattedDigits.length <= 10) {
-    const code = formattedDigits.slice(0, 3);
-    const first = formattedDigits.slice(3, 6);
-    const second = formattedDigits.slice(6, 8);
-    const third = formattedDigits.slice(8, 10);
-    return `+7 (${code})${first}-${second}-${third}`;
-  }
-
-  // Если больше 10 цифр, обрезаем до 10
-  const code = formattedDigits.slice(0, 3);
-  const first = formattedDigits.slice(3, 6);
-  const second = formattedDigits.slice(6, 8);
-  const third = formattedDigits.slice(8, 10);
+  // Полный формат: +7 (7XX)XXX-XX-XX (11 цифр: 7 + 10 цифр)
+  const first = remaining.slice(0, 3);
+  const second = remaining.slice(3, 5);
+  const third = remaining.slice(5, 7);
   return `+7 (${code})${first}-${second}-${third}`;
 };
 
