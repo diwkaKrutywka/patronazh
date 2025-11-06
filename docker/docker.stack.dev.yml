@@ -11,10 +11,6 @@ services:
       - ../stack.env
     networks:
       - traefik_internal
-      - patronage_network
-    # configs:
-    #   - source: patronage_conf
-    #     target: /etc/nginx/conf.d/default.conf
     deploy:
       mode: replicated
       replicas: 1
@@ -58,6 +54,4 @@ services:
 
 networks:
   traefik_internal:
-    external: true
-  patronage_network:
     external: true
