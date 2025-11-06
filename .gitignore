@@ -1,3 +1,5 @@
+.vscode
+
 # Environment variables
 .env
 .env.*

@@ -42,3 +42,19 @@ deploy-dev:
     - curl --fail --max-time 30 -X POST "${PORTAINER_WEBHOOK}/${PORTAINER_TOKEN}"
   only:
     - dev
+
+deploy-main:
+  stage: deploy
+  tags:
+    - shell
+  image: curlimages/curl:latest
+  before_script:
+    - |
+      if [ -z "$PORTAINER_WEBHOOK_PROD" ] || [ -z "$PORTAINER_TOKEN_PROD" ]; then
+        echo "Missing required webhook variables"
+        exit 1
+      fi
+  script:
+    - curl --fail --max-time 30 -X POST "${PORTAINER_WEBHOOK_PROD}/${PORTAINER_TOKEN_PROD}"
+  only:
+    - main
