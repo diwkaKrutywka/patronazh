@@ -289,6 +289,13 @@ const handlePhonePaste = (e: ClipboardEvent) => {
     const minPregnancyStartDate = birthDate.add(12, 'year').startOf('day');
     
     // Блокируем даты раньше минимальной допустимой даты
+    // Но если минимальная дата в будущем (человек еще не достиг 12 лет), 
+    // разрешаем все даты до текущего дня (на случай если это ошибка в данных)
+    if (minPregnancyStartDate > today) {
+      return false;
+    }
+    
+    // Блокируем только даты раньше минимальной допустимой даты
     return current < minPregnancyStartDate;
   };
   
