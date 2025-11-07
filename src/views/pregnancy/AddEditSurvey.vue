@@ -199,7 +199,7 @@ watch(
             planned_visit_date: data.planned_visit_date
           }
         } catch {
-          message.error($t('l_Failed_to_load_survey_details'))
+          // message.error($t('l_Failed_to_load_survey_details'))
         } finally {
           loading.value = false
         }
@@ -236,7 +236,7 @@ watch(
             }
           })
           .catch(() => {
-            message.error($t('l_Failed_to_load_survey_details'))
+            // message.error($t('l_Failed_to_load_survey_details'))
           })
           .finally(() => {
             loading.value = false
@@ -275,7 +275,7 @@ const handleSubmit = () => {
       resetForm()
     })
     .catch(() => {
-      message.error(props.surveyId ? $t('l_Error_updating_survey') : $t('l_Error_creating_survey'))
+      // message.error(props.surveyId ? $t('l_Error_updating_survey') : $t('l_Error_creating_survey'))
     })
     .finally(() => {
       loading.value = false

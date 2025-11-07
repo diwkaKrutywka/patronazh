@@ -327,7 +327,7 @@ const fetchKeyDates = async () => {
     const { data } = await KeyApi(props.childId, {}, "GET");
     keyDates.value = data.key_dates || [];
   } catch (error) {
-    console.error("Failed to load key dates:", error);
+    // console.error("Failed to load key dates:", error);
     keyDates.value = [];
   } finally {
     keyDatesLoading.value = false;
@@ -355,7 +355,7 @@ watch(
           );
           form.value = { ...data };
         } catch {
-          message.error($t("l_Failed_to_load_survey_details"));
+          // message.error($t("l_Failed_to_load_survey_details"));
         } finally {
           loading.value = false;
         }
@@ -381,7 +381,7 @@ watch(
             form.value = { ...data };
           })
           .catch(() => {
-            message.error($t("l_Failed_to_load_survey_details"));
+            // message.error($t("l_Failed_to_load_survey_details"));
           })
           .finally(() => {
             loading.value = false;
@@ -467,11 +467,11 @@ const handleSubmit = () => {
       resetForm();
     })
     .catch(() => {
-      message.error(
-        props.surveyId
-          ? $t("l_Error_updating_survey")
-          : $t("l_Error_creating_survey")
-      );
+      // message.error(
+      //   props.surveyId
+      //     ? $t("l_Error_updating_survey")
+      //     : $t("l_Error_creating_survey")
+      // );
     })
     .finally(() => {
       loading.value = false;
