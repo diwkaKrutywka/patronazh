@@ -421,8 +421,8 @@ const handleReopen = async () => {
     emit("success");
     visible.value = false;
   } catch (error) {
-    console.error('Error reopening case:', error);
-    message.error($t("l_Failed_to_return_patient"));
+    // console.error('Error reopening case:', error);
+    // message.error($t("l_Failed_to_return_patient"));
   } finally {
     loading.value = false;
   }

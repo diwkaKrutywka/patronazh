@@ -86,10 +86,12 @@
               >
             </a-button>
           </a-popover>
-        </div>
-        <a-button type="primary" @click="downloadExcel" class="w-full sm:w-auto"
+
+          <!-- Кнопка скачать Excel -->
+          <a-button type="primary" @click="downloadExcel" class="w-full sm:w-auto"
             >📄 {{ $t("l_Download_excel") }}</a-button
           >
+        </div>
       </template>
     </a-page-header>
 
@@ -418,8 +420,8 @@ const fetchClosedCases = async () => {
     tableData.value = data.items || data.results || [];
     pagination.value.total = data.total || data.count || 0;
   } catch (error) {
-    console.error('Error fetching closed cases:', error);
-    message.error($t("l_Failed_to_load_pregnant_list"));
+    // console.error('Error fetching closed cases:', error);
+    // message.error($t("l_Failed_to_load_pregnant_list"));
   } finally {
     loading.value = false;
   }

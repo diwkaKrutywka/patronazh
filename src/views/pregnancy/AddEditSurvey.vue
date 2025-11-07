@@ -164,7 +164,7 @@ const fetchKeyDates = async () => {
     const { data } = await KeyApi(props.pregnantWomanId, {}, 'GET')
     keyDates.value = data.key_dates || []
   } catch (error) {
-    console.error('Failed to load key dates:', error)
+    // console.error('Failed to load key dates:', error)
     keyDates.value = []
   } finally {
     keyDatesLoading.value = false

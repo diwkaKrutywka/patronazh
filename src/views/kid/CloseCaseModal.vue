@@ -80,7 +80,7 @@ const handleClose = async () => {
     emit("success");
     visible.value = false;
   } catch (error) {
-    message.error($t("l_Failed_to_close_case"));
+    // message.error($t("l_Failed_to_close_case"));
   } finally {
     loading.value = false;
   }

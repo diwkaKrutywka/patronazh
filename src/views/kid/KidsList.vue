@@ -545,7 +545,7 @@ const downloadTemplate = async () => {
 
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    message.error($t("l_File_download_failed"));
+  
     console.error(error);
   }
 };
@@ -564,8 +564,8 @@ const handleFileUpload = async (e: Event) => {
     message.success($t("l_File_upload_success"));
     fetchKids();
   } catch (error) {
-    message.error($t("l_File_upload_failed"));
-    console.error(error);
+    // message.error($t("l_File_upload_failed"));
+    // console.error(error);
   } finally {
     loading.value = false;
     target.value = "";

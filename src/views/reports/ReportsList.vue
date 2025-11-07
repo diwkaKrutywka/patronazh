@@ -22,7 +22,7 @@
           :disabled="dateMode !== 'month-year'"
         >
           <a-select-option v-for="m in 12" :key="m" :value="m">
-            {{ m }}
+            {{ $t(`month_${m}`) }}
           </a-select-option>
         </a-select>
         <a-input-number

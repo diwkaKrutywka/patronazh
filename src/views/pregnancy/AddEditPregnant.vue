@@ -342,7 +342,7 @@ const handlePhonePaste = (e: ClipboardEvent) => {
         emit("submit");
         closeModal();
       } catch {
-        message.error($t("l_Save_failed"));
+        // message.error($t("l_Save_failed"));
       } finally {
         loading.value = false;
       }

@@ -299,7 +299,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, h } from "vue";
-import { Avatar, message, Tag } from "ant-design-vue";
+import {  message, Tag } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import { PregnantApi } from "../../api/pregnancy";
 import AddEditPregnant from "./AddEditPregnant.vue";
@@ -484,7 +484,7 @@ const onDelete = async (id: string) => {
     message.success($t("l_Delete_success"));
     fetchPregnantWomen();
   } catch {
-    message.error($t("l_Delete_failed"));
+    // message.error($t("l_Delete_failed"));
   }
 };
 
@@ -503,7 +503,7 @@ const downloadTemplate = async () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch {
-    message.error($t("l_File_download_failed"));
+    // message.error($t("l_File_download_failed"));
   }
 };
 const downloadExcel = async () => {
@@ -521,7 +521,7 @@ const downloadExcel = async () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch {
-    message.error($t("l_File_download_failed"));
+    // message.error($t("l_File_download_failed"));
   }
 };
 const handleFileUpload = async (e: Event) => {
@@ -536,7 +536,7 @@ const handleFileUpload = async (e: Event) => {
     message.success($t("l_File_upload_success"));
     fetchPregnantWomen();
   } catch {
-    message.error($t("l_File_upload_failed"));
+    // message.error($t("l_File_upload_failed"));
   } finally {
     loading.value = false;
     target.value = "";
@@ -616,7 +616,7 @@ const fetchPregnantWomen = async () => {
     tableData.value = data.items;
     pagination.value.total = data.total;
   } catch {
-    message.error($t("l_Failed_to_load_pregnant_list"));
+    // message.error($t("l_Failed_to_load_pregnant_list"));
   } finally {
     loading.value = false;
   }

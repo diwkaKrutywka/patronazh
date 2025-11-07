@@ -178,7 +178,7 @@ const handleSubmit = () => {
       visible.value = false;
       emit("update:open", false);
     } catch (err) {
-      message.error($t("l_Save_error"));
+      
     } finally {
       loading.value = false;
     }

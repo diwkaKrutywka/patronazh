@@ -3,6 +3,8 @@ import axios from 'axios'
 import { useUserStore } from '../store/index'
 import router from '../router'
 import baseUrl from '../config'
+import { message } from 'ant-design-vue'
+import i18n from '../locales'
 
 const http = axios.create({
   baseURL: baseUrl.baseURL,
@@ -39,7 +41,7 @@ http.interceptors.request.use((config) => {
   return config
 })
 
-// Response interceptor — обновляем токен при 401
+// Response interceptor — обновляем токен при 401 и обрабатываем ошибки
 http.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -63,6 +65,28 @@ http.interceptors.response.use(
         store.clear()
         router.push('/login')
       }
+    }
+
+    // Обрабатываем все ошибки (кроме 401, который обработан выше)
+    if (error.response && error.response.status !== 200 && error.response.status !== 401) {
+      const errorData = error.response.data
+      const currentLocale = i18n.global.locale.value
+
+      // Определяем сообщение об ошибке в зависимости от языка
+      let errorMessage = errorData?.message || 'An error occurred'
+
+      if (errorData) {
+        if (currentLocale === 'ru' && errorData.message_ru) {
+          errorMessage = errorData.message_ru
+        } else if (currentLocale === 'kk' && errorData.message_kz) {
+          errorMessage = errorData.message_kz
+        } else if (errorData.message) {
+          errorMessage = errorData.message
+        }
+      }
+
+      // Показываем сообщение об ошибке
+      message.error(errorMessage)
     }
 
     return Promise.reject(error)
