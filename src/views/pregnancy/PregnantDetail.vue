@@ -67,9 +67,10 @@
       <span class="text-white font-bold">{{ $t('l_Close_case') }}</span>
     </div>
 
+    <div class="flex justify-center items-center my-2 p-4 bg-blue-200 opacity-70 rounded-md text-center w-full"><span>{{ $t('l_Rule_to_edit') }}</span></div>
     <!-- Список анкет -->
     <template v-if="data">
-      <div class="flex justify-between items-center mt-10 mb-2 p-4 bg-gray-200 flex-col sm:flex-row gap-3">
+      <div class="flex justify-between items-center mt-4 mb-2 p-4 bg-gray-200 flex-col sm:flex-row gap-3">
         <h3>{{ $t("l_Surveys") }}</h3>
         <a-button type="primary" class="w-full sm:w-auto" @click="onAddSurvey">
           <span class="material-symbols-outlined">
@@ -92,7 +93,7 @@
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'Action'">
               <a-space>
-                <img
+                <img v-if="record.can_edit"
                   class="w-[25px] mr-4"
                   src="../../assets/edit.png"
                   @click.stop="onEdit(record)"
