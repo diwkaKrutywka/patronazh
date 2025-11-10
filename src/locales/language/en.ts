@@ -273,4 +273,5 @@ export default {
   month_10: "October",
   month_11: "November",
   month_12: "December",
+  l_Rule_to_edit: "Editing rules: you can only edit within 24 hours after creating the survey",
 };
