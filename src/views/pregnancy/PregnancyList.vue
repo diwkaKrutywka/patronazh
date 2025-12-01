@@ -306,7 +306,7 @@ import AddEditPregnant from "./AddEditPregnant.vue";
 import PregnantDetail from "./PregnantDetail.vue";
 import dayjs from "dayjs";
 import type { TableRenderProps } from "../../types/table";
-const { t: $t } = useI18n();
+const { t: $t, locale } = useI18n();
 
 const detailVisible = ref(false);
 const selectedId = ref<string>();
@@ -438,13 +438,13 @@ const columns = [
   },
   {
     title: $t("l_Scheduled_next_visit_date"),
-    dataIndex: "planned_next_visit_date",
-    width: 100,
+    dataIndex: "upcoming_key_date",
+    width: 150,
     responsive: ["md"],
     ellipsis: false,
     customRender: ({ text }: TableRenderProps<Pregnant>) => {
       if (text) {
-        return h(Tag, { color: "green" }, () => text);
+        return h(Tag, { color: "green" }, () => text.week_range?text.week_range.start+" - "+text.week_range.end:text.date);
       }
       return "";
     },
@@ -530,13 +530,41 @@ const handleFileUpload = async (e: Event) => {
   const file = target.files[0];
   const formData = new FormData();
   formData.append("file", file);
+  
+  // Получаем текущий язык
+  const currentLocale = locale.value;
+  
   try {
     loading.value = true;
-    await PregnantApi("upload/", formData, "POST", { fileUpload: true });
-    message.success($t("l_File_upload_success"));
+    const response = await PregnantApi("upload/", formData, "POST", { fileUpload: true });
+    
+    // Определяем сообщение в зависимости от языка
+    let successMessage = $t("l_File_upload_success");
+    if (response.data) {
+      if (currentLocale === 'ru' && response.data.message_ru) {
+        successMessage = response.data.message_ru;
+      } else if (currentLocale === 'kk' && response.data.message_kz) {
+        successMessage = response.data.message_kz;
+      } else if (response.data.message) {
+        successMessage = response.data.message;
+      }
+    }
+    
+    message.success(successMessage);
     fetchPregnantWomen();
-  } catch {
-    // message.error($t("l_File_upload_failed"));
+  } catch (error: any) {
+    let errorMessage = $t("l_File_upload_failed");
+    if (error?.response?.data) {
+      if (currentLocale === 'ru' && error.response.data.message_ru) {
+        errorMessage = error.response.data.message_ru;
+      } else if (currentLocale === 'kk' && error.response.data.message_kz) {
+        errorMessage = error.response.data.message_kz;
+      } else if (error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+    }
+    
+    message.error(errorMessage);
   } finally {
     loading.value = false;
     target.value = "";
